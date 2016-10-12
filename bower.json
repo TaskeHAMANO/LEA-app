@@ -1,0 +1,22 @@
+{
+  "name": "LEA",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Shinya SUZUKI <minasitawakou@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "bootstrap-tokenfield": "^0.12.1",
+    "jquery": "^3.1.1"
+  }
+}
