@@ -11,7 +11,6 @@ import gulpFilter         from "gulp-filter"
 import gulpMinifyCss      from "gulp-minify-css"
 import gulpLess           from "gulp-less"
 import gulpImagemin       from "gulp-imagemin"
-import gulpDebug          from "gulp-debug"
 import pngquant           from "imagemin-pngquant"
 import {rollup}           from "rollup"
 import rollupResolve      from "rollup-plugin-node-resolve"
@@ -150,7 +149,6 @@ gulp.task("build:js", gulp.series(
           "temp/dist/riot.min.js",
           "temp/dist/main.min.js",
         ])
-        .pipe(gulpDebug())
         .pipe(gulpConcat({ path: "index.js" }))
         .pipe(gulp.dest("dist")),
 ));
