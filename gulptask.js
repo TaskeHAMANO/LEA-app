@@ -65,6 +65,7 @@ gulp.task("concat:css", () => gulp
 
 gulp.task("build:js", gulp.series(
     gulp.parallel(
+        // Riot.jsのtagファイルをECMA6へコンパイルする
         ()=> gulp
             .src(["src/riot/**/*.tag"])
             .pipe(gulpRiot({
@@ -79,15 +80,18 @@ gulp.task("build:js", gulp.series(
                 },
             }))
             .pipe(gulp.dest("temp/riot")),
+        // Tagとは別に書かれたECMA6をECMA5へコンパイル
         ()=> gulp
             .src(["src/babel/**/*.js"])
             .pipe(gulpBabel())
             .pipe(gulp.dest("temp/babel")),
+        // ECMA6で書かれたindex.jsをECMA5へコンパイル
         ()=> gulp
             .src(["src/index.js"])
             .pipe(gulpBabel())
             .pipe(gulp.dest("temp")),
     ),
+    // ECMA5で書かれたエントリーファイルを読み込んで、関連モジュールを１つに纏める
     async ()=> {
         const bundle = await rollup({
             entry: "temp/index.js",
@@ -112,11 +116,13 @@ gulp.task("build:js", gulp.series(
             moduleName: "main"
         });
     },
+    // rollupされたファイルを最小化する
     ()=> gulp
         .src(["temp/rollup/main.js"])
         .pipe(gulpUglify())
         .pipe(gulpRename({ extname: ".min.js" }))
         .pipe(gulp.dest("temp/dist")),
+    // bowerで入れたファイルを最小化する
     async ()=> {
       const jsFilter = await gulpFilter("**/*.js", {restore:true});
       return gulp
@@ -126,10 +132,13 @@ gulp.task("build:js", gulp.series(
           }
         }))
         .pipe(jsFilter)
-        .pipe(gulpUglify())
+        .pipe(gulpUglify({
+          preserveComments: "some"
+        }))
         .pipe(gulpRename({ extname: ".min.js"}))
         .pipe(gulp.dest("./temp/dist"))
     },
+    // 最小化されたmain.jsと関連するbowerで入れたライブラリを結合して出力する
     ()=> gulp
         .src(["src/bundle/**/*.min.js", "temp/dist/*.min.js"])
         .pipe(gulpConcat({ path: "index.js" }))
@@ -153,6 +162,17 @@ gulp.task("move_data", () => {
 });
 
 gulp.task("build", gulp.series(
+    gulpClean(["temp", "dist/*.html", "dist/*.js", "dist/*.css"]),
+    gulp.parallel(
+        gulp.task("build:js"),
+        gulp.task("build:html"),
+    ),
+    gulp.task("select:css"),
+    gulp.task("concat:css"),
+    gulpClean(["temp"]),
+));
+
+gulp.task("full_build", gulp.series(
     gulpClean(["temp", "dist"]),
     gulp.parallel(
         gulp.task("build:js"),
@@ -162,4 +182,4 @@ gulp.task("build", gulp.series(
     gulp.task("select:css"),
     gulp.task("concat:css"),
     gulpClean(["temp"]),
-));
+)); 

@@ -15,8 +15,6 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "^3.3.7",
-    "bootstrap-tokenfield": "^0.12.1",
-    "jquery": "^3.1.1"
+    "bootstrap-tokenfield": "^0.12.1"
   }
 }
