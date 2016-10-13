@@ -11,6 +11,7 @@ import gulpFilter         from "gulp-filter"
 import gulpMinifyCss      from "gulp-minify-css"
 import gulpLess           from "gulp-less"
 import gulpImagemin       from "gulp-imagemin"
+import gulpDebug          from "gulp-debug"
 import pngquant           from "imagemin-pngquant"
 import {rollup}           from "rollup"
 import rollupResolve      from "rollup-plugin-node-resolve"
@@ -123,8 +124,8 @@ gulp.task("build:js", gulp.series(
         .pipe(gulpRename({ extname: ".min.js" }))
         .pipe(gulp.dest("temp/dist")),
     // bowerで入れたファイルを最小化する
-    async ()=> {
-      const jsFilter = await gulpFilter("**/*.js", {restore:true});
+    ()=> {
+      const jsFilter = gulpFilter("**/*.js", {restore:true});
       return gulp
         .src(bower({
           paths:{
@@ -139,8 +140,17 @@ gulp.task("build:js", gulp.series(
         .pipe(gulp.dest("./temp/dist"))
     },
     // 最小化されたmain.jsと関連するbowerで入れたライブラリを結合して出力する
+    // 依存関係を明示的に示すために手で書いている(gulp-orderでは上手く行かなかった。)
     ()=> gulp
-        .src(["src/bundle/**/*.min.js", "temp/dist/*.min.js"])
+        .src([
+          "temp/dist/jquery.min.js",
+          "temp/dist/bootstrap.min.js",
+          "temp/dist/bootstrap-tokenfield.min.js",
+          "temp/dist/d3.min.js",
+          "temp/dist/riot.min.js",
+          "temp/dist/main.min.js",
+        ])
+        .pipe(gulpDebug())
         .pipe(gulpConcat({ path: "index.js" }))
         .pipe(gulp.dest("dist")),
 ));
