@@ -1,3 +1,7 @@
+import RiotControl from "riotcontrol"
+import SampleStore from "Store/SampleStore"
+import SampleAction from "Action/StoreAction"
+
 <my-map>
   <div class="d3-chart"></div>
   <style scoped>
