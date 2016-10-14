@@ -1,5 +1,5 @@
 <my-panel>
-  <ul class="nav nav-tabs nav-justified">
+  <ul class="nav nav-tabs nav-justified nav-extend">
     <li each={tab, i in tabs} class="{tab:true, active:parent.isActiveTab(tab)}" onclick={ parent.changeTab }>
       <a href="javascript:void(0)">{tab.label}</a>
     </li>
@@ -13,8 +13,11 @@
   </div>
 
   <style scoped>
-    .content {
-      height:100%;
+    .nav-extend{
+      height:10%
+    }
+    .content, my-search, my-info{
+      height:90%;
     }
   </style>
 
