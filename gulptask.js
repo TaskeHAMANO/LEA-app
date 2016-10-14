@@ -147,6 +147,7 @@ gulp.task("build:js", gulp.series(
           "temp/dist/bootstrap-tokenfield.min.js",
           "temp/dist/d3.min.js",
           "temp/dist/riot.min.js",
+          "temp/dist/fetch.min.js",
           "temp/dist/main.min.js",
         ])
         .pipe(gulpConcat({ path: "index.js" }))
