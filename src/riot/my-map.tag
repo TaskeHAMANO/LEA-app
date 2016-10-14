@@ -11,8 +11,14 @@ import SampleAction from "Action/StoreAction"
   </style>
 
   <script type="text/javascript">
+    var self = this;
     this.on("mount", ()=>{
-      var self = this;
+      const sampleAction = new SampleAction();
+
+      self.setStore = (sample_id) =>{
+        sampleAction.setStore(sample_id);
+      }
+      sampleAction.resetStore();
 
       d3.queue()
         .defer(d3.csv, "data/data.csv")
@@ -87,6 +93,7 @@ import SampleAction from "Action/StoreAction"
               .attr("r", 2)
               .attr("transform", transform_sample)
               .style("fill", function(d) { return d.color; })
+              .on("click", function(d){return self.setStore(d.SampleID)})
 
           function zoom() {
             svg.attr("transform", d3.event.transform);
