@@ -93,7 +93,9 @@ import SampleIDAction from "Action/SampleIDStoreAction"
               .attr("r", 2)
               .attr("transform", transform_sample)
               .style("fill", function(d) { return d.color; })
-              .on("click", function(d){return self.setStore(d.SampleID)})
+              .on("click", function(d){
+                return self.setStore(d.SampleID)
+              })
 
           function zoom() {
             svg.attr("transform", d3.event.transform);

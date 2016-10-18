@@ -1,6 +1,6 @@
 import RiotControl from "riotcontrol"
 import SampleIDStore from "Store/SampleIDStore"
-import SampleIDAction from "Action/SampleIDStoreAction"
+import SampleTopicAction from "Action/SampleTopicStoreAction"
 
 <my-info>
   <div class="container-fluid">
@@ -35,6 +35,11 @@ import SampleIDAction from "Action/SampleIDStoreAction"
   <script>
     this.on("mount", ()=>{
       var self = this;
+      const sampleTopicAction = new SampleTopicAction();
+      self.setStore = (topic_data) => {
+        sampleTopicAction.setStore(topic_data)
+      }
+      sampleTopicAction.resetStore();
 
       // Dispatcherから発火が伝えられたら動作開始
       RiotControl.on(SampleIDStore.ActionTypes.changed, ()=>{
@@ -45,14 +50,15 @@ import SampleIDAction from "Action/SampleIDStoreAction"
             self.sample_name = json.metadata.SampleName;
             self.sample_url = json.metadata.SampleURL;
             self.update()
-            fetch(`http://localhost:5000/sample/${this.sample_id}/topics`)
-              .then((response)=>response.json())
-              .then((json)=>{
-                let topic_list = {}
-                topic_list[self.sample_id] = json.topic_list ;
-                self.update({topic_list: topic_list})
-              })
           });
+        fetch(`http://localhost:5000/sample/${this.sample_id}/topics`)
+          .then((response)=>response.json())
+          .then((json)=>{
+            let topic_list = {}
+            topic_list[self.sample_id] = json.topic_list ;
+            self.setStore(topic_list)
+            self.update({topic_list: topic_list})
+          })
       });
     });
   </script>
