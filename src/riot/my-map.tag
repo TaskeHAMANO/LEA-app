@@ -1,6 +1,6 @@
 import RiotControl from "riotcontrol"
-import SampleStore from "Store/SampleStore"
-import SampleAction from "Action/StoreAction"
+import SampleIDStore from "Store/SampleIDStore"
+import SampleIDAction from "Action/SampleIDStoreAction"
 
 <my-map>
   <div class="d3-chart"></div>
@@ -13,12 +13,12 @@ import SampleAction from "Action/StoreAction"
   <script type="text/javascript">
     var self = this;
     this.on("mount", ()=>{
-      const sampleAction = new SampleAction();
+      const sampleIDAction = new SampleIDAction();
 
       self.setStore = (sample_id) =>{
-        sampleAction.setStore(sample_id);
+        sampleIDAction.setStore(sample_id);
       }
-      sampleAction.resetStore();
+      sampleIDAction.resetStore();
 
       d3.queue()
         .defer(d3.csv, "data/data.csv")

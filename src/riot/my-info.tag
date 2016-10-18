@@ -1,6 +1,6 @@
 import RiotControl from "riotcontrol"
-import SampleAction from "Action/StoreAction"
-import SampleStore from "Store/SampleStore"
+import SampleIDStore from "Store/SampleIDStore"
+import SampleIDAction from "Action/SampleIDStoreAction"
 
 <my-info>
   <div class="container-fluid">
@@ -16,7 +16,7 @@ import SampleStore from "Store/SampleStore"
         <div id="taxon_chart" if={taxon_list}><my-bar data={taxon_list}></my-bar></div>
       </div>
       <div class="col-lg-6">
-        <div id="topic_chart" if={topic_list}><my-bar data={topic_list}></my-bar></div>
+        <div id="topic_chart"><my-bar if={topic_list} data={topic_list} element_name="topic_id"></my-bar></div>
       </div>
     </div>
   </div>
@@ -34,12 +34,11 @@ import SampleStore from "Store/SampleStore"
   </style>
   <script>
     this.on("mount", ()=>{
-      const action = new SampleAction();
       var self = this;
 
       // Dispatcherから発火が伝えられたら動作開始
-      RiotControl.on(SampleStore.ActionTypes.changed, ()=>{
-        self.sample_id = SampleStore.sample_id;
+      RiotControl.on(SampleIDStore.ActionTypes.changed, ()=>{
+        self.sample_id = SampleIDStore.sample_id;
         fetch(`http://localhost:5000/sample/${this.sample_id}/metadata`)
           .then((response) =>response.json())
           .then((json)=>{
@@ -51,8 +50,7 @@ import SampleStore from "Store/SampleStore"
               .then((json)=>{
                 let topic_list = {}
                 topic_list[self.sample_id] = json.topic_list ;
-                self.topic_list = topic_list;
-                self.update()
+                self.update({topic_list: topic_list})
               })
           });
       });

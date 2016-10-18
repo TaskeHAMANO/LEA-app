@@ -1,7 +1,7 @@
 import RiotControl from 'riotcontrol'
-import SampleActionTypes from "Constant/SampleActionTypes"
+import SampleIDActionTypes from "Constant/SampleIDActionTypes"
 
-const store = new class SampleStore{
+const store = new class SampleIDStore{
   get sample_id(){
     return this._sample_id
   }
@@ -13,8 +13,8 @@ const store = new class SampleStore{
     this._sample_id = ""
 
     // actiontypeが与えられると、後ろの関数が実行される
-    this.on(SampleActionTypes.resetSampleStore, this._setValue.bind(this));
-    this.on(SampleActionTypes.setSampleStore, this._setValue.bind(this));
+    this.on(SampleIDActionTypes.resetSampleIDStore, this._setValue.bind(this));
+    this.on(SampleIDActionTypes.setSampleIDStore, this._setValue.bind(this));
   }
 
   _setValue(storeAction){
@@ -25,7 +25,7 @@ const store = new class SampleStore{
 
 // オブジェクト変数の初期化
 store.ActionTypes = {
-  changed:"sample_store_changed"
+  changed:"sample_id_store_changed"
 }
 
 // RiotControlに代入
