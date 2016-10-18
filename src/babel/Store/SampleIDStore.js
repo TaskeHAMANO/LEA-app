@@ -24,9 +24,7 @@ const store = new class SampleIDStore{
 }();
 
 // オブジェクト変数の初期化
-store.ActionTypes = {
-  changed:"sample_id_store_changed"
-}
+store.ActionTypes = {changed:"sample_id_store_changed"}
 
 // RiotControlに代入
 RiotControl.addStore(store);
