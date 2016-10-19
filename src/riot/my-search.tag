@@ -1,21 +1,18 @@
 <my-search>
-  <form onsubmit={ search }>
-    <input name="input" onkeyup={ edit }>
-    <button disabled={ !text }>Search</button>
+  <form onsubmit='{submit}'>
+    <input type="text" name="searched_text">
+    <button type="submit" name="submit" disabled={ !searched_text }>Search</button>
   </form>
 
   <script>
-    this.disabled = true
     var self = this
-
-    function edit(e){
-      this.text = e.target.value ;
-    }
-
-    function search(text){
-      fetch("http://example/com/api/string/" + text)
-        .then(data => { return data.json()})
-        .then(json => { self.update()})
+    this.submit = function(){
+      console.log(this.searched_text.value)
+      fetch(`http://localhost:5000/string/${this.searched_text.value}/samples?n_limit=10`)
+        .then((response) => response.json())
+        .then((json) => {
+          console.log(json.sample_list);
+        })
     }
   </script>
 </my-search>
