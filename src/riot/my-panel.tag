@@ -11,6 +11,9 @@
   <div class="content" if="{activeTab==="info"}">
     <my-info></my-info>
   </div>
+  <div class="content" if="{activeTab==="download"}">
+    <my-download></my-download>
+  </div>
 
   <style scoped>
     .nav-extend{
@@ -32,6 +35,10 @@
       {
         type:"info",
         label:"Information"
+      },
+      {
+        type:"download",
+        label:"Download"
       }
     ]
     // 初期値をsearchで保存する
