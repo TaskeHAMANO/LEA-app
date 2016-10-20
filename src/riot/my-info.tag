@@ -1,4 +1,3 @@
-import RiotControl from "riotcontrol"
 import SampleIDStore from "Store/SampleIDStore"
 import SampleTopicAction from "Action/SampleTopicStoreAction"
 
@@ -16,7 +15,7 @@ import SampleTopicAction from "Action/SampleTopicStoreAction"
         <div id="taxon_chart" if={taxon_list}><my-bar data={taxon_list}></my-bar></div>
       </div>
       <div class="col-lg-6">
-        <div id="topic_chart"><my-bar if={topic_list} data={topic_list} element_name="topic_id"></my-bar></div>
+        <div id="topic_chart"><my-bar></my-bar></div>
       </div>
     </div>
   </div>
@@ -42,7 +41,7 @@ import SampleTopicAction from "Action/SampleTopicStoreAction"
       sampleTopicAction.resetStore();
 
       // Dispatcherから発火が伝えられたら動作開始
-      RiotControl.on(SampleIDStore.ActionTypes.changed, ()=>{
+      SampleIDStore.on(SampleIDStore.ActionTypes.changed, ()=>{
         self.sample_id = SampleIDStore.sample_id;
         fetch(`http://localhost:5000/sample/${this.sample_id}/metadata`)
           .then((response) =>response.json())
