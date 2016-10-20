@@ -1,4 +1,3 @@
-import RiotControl    from 'riotcontrol'
 import SampleTopicAction from "Action/SampleTopicStoreAction"
 import SampleTopicStore from 'Store/SampleTopicStore'
 
@@ -7,14 +6,14 @@ import SampleTopicStore from 'Store/SampleTopicStore'
 
   <script>
     this.on("mount", ()=>{
-      RiotControl.on(SampleTopicStore.ActionTypes.changed, ()=>{
+      SampleTopicStore.on(SampleTopicStore.ActionTypes.changed, ()=>{
         this.topic_data = SampleTopicStore.topic_data;
         d3.select("#d3-chart svg").remove();
         visualize_bar_chart(this.topic_data);
       })
     })
 
-    function visualize_bar_chart(){
+    function visualize_bar_chart(data){
       let chart_div = d3.select("#d3-chart");
       // 大きさの取得のためにcontentのDOMを指定
       let content = d3.select(".content")
@@ -38,8 +37,7 @@ import SampleTopicStore from 'Store/SampleTopicStore'
       let y = d3.scaleLinear()
         .rangeRound([bar_height, 0]);
       let z = d3.scaleOrdinal(d3.schemeCategory10);
-      let data = opts.data ;
-      let element_name = opts.element_name ;
+      let element_name = "topic_id" ;
       let sample_list = []
       for (let key in data){
         sample_list.push(key)
@@ -48,7 +46,7 @@ import SampleTopicStore from 'Store/SampleTopicStore'
 
       x.domain(sample_list);
       // 得られたJSONから、valueの最大値を取得す
-      y.domain([0, d3.max(sample_list.map((key) => d3.sum(data[key].map((obj) => obj.value))))]).nice();
+      y.domain([0, 0.99 * d3.max(sample_list.map((key) => d3.sum(data[key].map((obj) => obj.value))))]).nice();
       z.domain(element_list);
       // dataをd3.stackを使える形式に変換する
       data = sample_list.map((key) =>{
