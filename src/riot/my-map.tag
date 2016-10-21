@@ -44,9 +44,8 @@ import SampleListStore  from "Store/SampleListStore"
           let svg = chart_div.append("svg")
               .attr("width", svg_width)
               .attr("height", svg_height)
-            .append("g")
               .call(zoomBehavior)
-            .append("g");
+            .append("g")
 
           let margin = { top: 0, right: 0, bottom: 0, left: 0},
             topic_width = 60,
@@ -107,19 +106,6 @@ import SampleListStore  from "Store/SampleListStore"
       });
     }
 
-    // original_colorを持っていたら、それをcolorへ代入する
-    // 持っていなかったら、現在のcolorを代入する
-    function initialize_color(){
-     d3.selectAll(".dot")
-       .each((d) => {
-         if(typeof d.__original_color !== "undefined"){
-          d.color = d.__original_color ;
-         }else{
-          d.__original_color = d.color ;
-         }
-       })
-    }
-
     this.on("mount", ()=>{
       const sampleIDAction = new SampleIDAction();
       // D3の図形を描画する
@@ -135,8 +121,6 @@ import SampleListStore  from "Store/SampleListStore"
       SampleListStore.on(SampleListStore.ActionTypes.changed, ()=>{
         let sample_list = SampleListStore.sample_list;
         let candidate = sample_list.map((d)=>d.sample_id);
-        // 色を戻す
-        initialize_color();
 
         if(candidate.length !== 0){
           d3.selectAll(".dot")
@@ -144,25 +128,22 @@ import SampleListStore  from "Store/SampleListStore"
             .transition()
             .duration(1000)
             .style("fill", (d) => {
-              return d3.color(d.color).brighter(8)
+              return d3.color(d.color).brighter(1.5)
             })
-            .style("opacity", 1.0)
+            .style("visibility", "visible")
           ;
           d3.selectAll(".dot")
             .filter((d) => !(candidate.includes(d.SampleID)))
             .transition()
             .duration(1000)
-            .style("fill", (d) => {
-              return d3.color(d.color).darker(8)
-            })
-            .style("opacity", 0.05)
+            .style("visibility", "hidden")
           ;
         }else{
           d3.selectAll(".dot")
             .transition()
             .duration(1000)
             .style("fill", (d) => d3.color(d.color))
-            .style("opacity", 1.0 )
+            .style("visibility", "visible")
           ;
         }
       })
