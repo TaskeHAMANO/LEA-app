@@ -3,10 +3,10 @@ import SampleIDAction   from "Action/SampleIDStoreAction"
 import SampleListStore  from "Store/SampleListStore"
 
 <my-map>
-  <div class="d3-chart"></div>
+  <div class="d3-map"></div>
   <style scoped>
-    .d3-chart {
-      background-color:#000;
+    .d3-map{
+      background-color: black;
     }
     .dot {
       cursor: pointer;
@@ -36,7 +36,7 @@ import SampleListStore  from "Store/SampleListStore"
               .on("zoom", zoom)
               .scaleExtent([1, 10]);
 
-          let chart_div = d3.select(".d3-chart")
+          let chart_div = d3.select(".d3-map")
               .style("min-width", "100%")
               .style("min-height", "100%");
           let svg_width = chart_div.node().getBoundingClientRect().width;
@@ -45,7 +45,16 @@ import SampleListStore  from "Store/SampleListStore"
               .attr("width", svg_width)
               .attr("height", svg_height)
               .call(zoomBehavior)
+              .call(drag)
             .append("g")
+          ;
+
+          // ダウンロード時を想定して、背景用の四角形を作る
+          svg.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("fill", "black")
+          ;
 
           let margin = { top: 0, right: 0, bottom: 0, left: 0},
             topic_width = 60,
@@ -96,6 +105,18 @@ import SampleListStore  from "Store/SampleListStore"
 
           function zoom() {
             svg.attr("transform", d3.event.transform);
+          }
+          function drag() {
+            d3.drag()
+              .on("drag",(d,i) => {
+                d.x += d3.event.dx
+                d.y += d3.event.dy
+                d3.select(this)
+                  .attr("transform", (d,i) => {
+                    return "translate(" + [d.x, d.y ] + ")"
+                  })
+              })
+            ;
           }
           function transform_sample(d) {
             return "translate(" + x(d.x) + "," + y(d.y) + ")";
