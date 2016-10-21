@@ -2,21 +2,15 @@ import SampleListStore from "Store/SampleListStore"
 import SampleListAction from "Action/SampleListStoreAction"
 
 <my-search>
-  <div class="container-fluid">
-    <div class="row">
-      <form onsubmit='{submit}'>
-        <div class="col-lg-7">
-            <input type="text" name="searched_text">
-        </div>
-        <div class="col-lg-2">
-            <button type="reset" name="reset" >Reset</button>
-        </div>
-        <div class="col-lg-2">
-            <button type="submit" name="submit" disabled={ !searched_text }>Search</button>
-        </div>
-        <div class="col-lg-1">
-        </div>
-      </form>
+  <div class="well">
+    <form onsubmit='{submit}'>
+      <div class="form-group">
+        <p>Search samples by text input</p>
+        <input type="text" name="searched_text" class="form-control">
+      </div>
+      <button type="reset" name="reset" class="btn btn-default" onclick='{reset}'>Reset</button>
+      <button type="submit" name="submit" class="btn btn-primary">Search</button>
+    </form>
   </div>
 
   <script>
@@ -32,6 +26,11 @@ import SampleListAction from "Action/SampleListStoreAction"
       }
       sampleListAction.resetStore();
     })
+
+    this.reset = function(){
+      this.searched_text.value = "" ;
+      self.resetStore();
+    }
 
     this.submit = function(){
       if(this.searched_text.value.length !== 0){
