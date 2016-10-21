@@ -56,7 +56,7 @@ import SampleTopicAction from "Action/SampleTopicStoreAction"
             let topic_list = {}
             topic_list[self.sample_id] = json.topic_list ;
             self.setStore(topic_list)
-            self.update({topic_list: topic_list})
+            self.update()
           })
       });
     });
