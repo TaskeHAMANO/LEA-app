@@ -77,30 +77,37 @@ aglio -i api.md --server
         + topic_list(array, required)
             + (object)
                 + word (array, required)
-                    + soil (string)
-                    + dog (string)
-                    + wood (string)
-                    + forest (string)
-                    + leaf (string)
+                    + (object)
+                        + word: soil (string)
+                        + value: 0.43 (number)
+                    + (object)
+                        + word: dog (string)
+                        + value: 0.22 (number)
+                    + (object)
+                        + word: wood (string)
+                        + value: 0.11 (number)
+                    + (object)
+                        + word: forest (string)
+                        + value: 0.06 (number)
+                    + (object)
+                        + word: leaf (string)
+                        + value: 0.01 (number)
                 + taxonomy (array, required)
-                    + enterococcus (string)
-                    + streptococcus (string)
-                    + betabactor (string)
-                    + proteobacteria (string)
-                    + actinobacteria (string)
-            + (object)
-                + word (array, required)
-                    + sediment (string)
-                    + rock (string)
-                    + cow (string)
-                    + foot (string)
-                    + shoes (string)
-                + taxonomy (array, required)
-                    + chloroflexi (string)
-                    + tenericutes (string)
-                    + deinococcus-Thermus (string)
-                    + proteobacteria (string)
-                    + firmicutes (string)
+                    + (object)
+                        + taxon: enterococcus (string)
+                        + value: 0.83 (number)
+                    + (object)
+                        + taxon: streptococcus (string)
+                        + value: 0.55 (number)
+                    + (object)
+                        + taxon: betabactor (string)
+                        + value: 0.40 (number)
+                    + (object)
+                        + taxon: proteobacteria (string)
+                        + value: 0.30 (number)
+                    + (object)
+                        + taxon: actinobacteria (string)
+                        + value: 0.23 (number)
 
 ## 単語から意味的トピックを取得 [/string/{searched_string}/topics/semantic{?n_topic_limit,n_element_limit}]
 
@@ -128,34 +135,41 @@ aglio -i api.md --server
         + topic_list(array, required)
             + (object)
                 + word (array, required)
-                    + soil (string)
-                    + dog (string)
-                    + wood (string)
-                    + forest (string)
-                    + leaf (string)
+                    + (object)
+                        + word: soil (string)
+                        + value: 0.87 (number)
+                    + (object)
+                        + word: dog (string)
+                        + value: 0.60 (number)
+                    + (object)
+                        + word: wood (string)
+                        + value: 0.55 (number)
+                    + (object)
+                        + word: forest (string)
+                        + value: 0.43 (number)
+                    + (object)
+                        + word: leaf (string)
+                        + value: 0.23 (number)
                 + taxonomy (array, required)
-                    + enterococcus (string)
-                    + streptococcus (string)
-                    + betabactor (string)
-                    + proteobacteria (string)
-                    + actinobacteria (string)
-            + (object)
-                + word (array, required)
-                    + sediment (string)
-                    + rock (string)
-                    + cow (string)
-                    + foot (string)
-                    + shoes (string)
-                + taxonomy (array, required)
-                    + chloroflexi (string)
-                    + tenericutes (string)
-                    + deinococcus-Thermus (string)
-                    + proteobacteria (string)
-                    + firmicutes (string)
+                    + (object)
+                        + taxon: enterococcus (string)
+                        + value: 0.95 (number)
+                    + (object)
+                        + taxon: streptococcus (string)
+                        + value: 0.44 (number)
+                    + (object)
+                        + taxon: betabactor (string)
+                        + value: 0.39 (number)
+                    + (object)
+                        + taxon: proteobacteria (string)
+                        + value: 0.20 (number)
+                    + (object)
+                        + taxon: actinobacteria (string)
+                        + value: 0.02 (number)
 
 ## サンプルの位置を返す [/sample/location]
 
-### 位置取得API [GET]
+### サンプル位置取得API [GET]
 
 #### 処理概要
 
@@ -168,11 +182,12 @@ aglio -i api.md --server
             + (object)
                 + x : 23.4 (number, required)
                 + y : 235.2 (number, required)
+                + color: "#9428ff" (string, required)
                 + sample_id : DRS000009 (string, required)
                 
 ## サンプルIDから系統組成取得 [/sample/{sample_id}/taxonomies/{taxon_rank}]
 
-### 系統組成取得API [GET]
+### サンプル系統組成取得API [GET]
 
 #### 処理概要
 
@@ -198,7 +213,7 @@ aglio -i api.md --server
 
 ## サンプルIDからトピック組成取得 [/sample/{sample_id}/topics]
 
-### 系統組成取得API [GET]
+### サンプルトピック組成取得API [GET]
 
 #### 処理概要
 
@@ -222,7 +237,7 @@ aglio -i api.md --server
 
 ## サンプルIDからメタデータ取得 [/sample/{sample_id}/metadata]
 
-### メタデータ取得API [GET]
+### サンプルメタデータ取得API [GET]
 
 #### 処理概要
 
@@ -238,11 +253,28 @@ aglio -i api.md --server
     + Attributes
         + metadata(required)
             + sample_name: hot spring sample(string, required)
+            + sample_url: http://example.com/SRS123456 (string, required)
 
+## トピックの位置を返す [/topic/location]
+
+### トピック位置取得API [GET]
+
+#### 処理概要
+
+* トピックの位置を返す
+
++ Response 200 (application/json)
+
+    + Attributes
+        + topic_list(array, required)
+            + (object)
+                + x : 23.4 (number, required)
+                + y : 235.2 (number, required)
+                + topic_id : 5 (number, required)
 
 ## トピックIDから単語組成取得 [/topic/words/{topic_id}]
 
-### 単語組成取得API [GET]
+### トピック単語組成取得API [GET]
 
 #### 処理概要
 
@@ -266,7 +298,7 @@ aglio -i api.md --server
 
 ## トピックIDから系統組成取得 [/topic/taxonomies/{topic_id}]
 
-### 系統組成取得API [GET]
+### トピック系統組成取得API [GET]
 
 #### 処理概要
 
