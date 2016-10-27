@@ -1,3 +1,6 @@
+import TabStore   from "Store/TabStore"
+import TabAction  from "Action/TabStoreAction"
+
 <my-panel>
   <ul class="nav nav-tabs nav-justified nav-extend">
     <li each={tab, i in tabs} class="{tab:true, active:parent.isActiveTab(tab)}" onclick={ parent.changeTab }>
@@ -26,6 +29,22 @@
 
   <script>
     var self = this;
+    this.on("mount", () => {
+      const tabAction = new TabAction();
+
+      TabStore.on(TabStore.ActionTypes.changed, () => {
+        self.activeTab = TabStore.tab;
+        self.update();
+      })
+
+      self.setStore = (tab) => {
+        tabAction.setStore(tab);
+      }
+      tabAction.resetStore();
+      self.activeTab = TabStore.tab;
+      self.update();
+    })
+
     // データのパターン
     self.tabs = [
       {
@@ -41,8 +60,6 @@
         label:"Download"
       }
     ]
-    // 初期値をsearchで保存する
-    self.activeTab = "search"
 
     // 入力されているtabがactiveか判断してboolを返す
     self.isActiveTab =  function(tab){
@@ -51,7 +68,7 @@
 
     // 受け取った値をself.activeTabへ代入する
     self.changeTab = function(e){
-      self.activeTab = e.item.tab.type;
+      self.setStore(e.item.tab.type) ;
     };
   </script>
 

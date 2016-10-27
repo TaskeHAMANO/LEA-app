@@ -1,5 +1,5 @@
-import SampleIDStore    from "Store/SampleIDStore"
 import SampleIDAction   from "Action/SampleIDStoreAction"
+import TabAction      from "Action/TabStoreAction"
 import SampleListStore  from "Store/SampleListStore"
 
 <my-map>
@@ -44,6 +44,10 @@ import SampleListStore  from "Store/SampleListStore"
           let svg = chart_div.append("svg")
               .attr("width", svg_width)
               .attr("height", svg_height)
+              .attr("id", "map_svg")
+              .attr("xmlns", "http://www.w3.org/2000/svg")
+              .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+              .attr("version", "1.1")
               .call(zoomBehavior)
               .call(drag)
             .append("g")
@@ -101,7 +105,10 @@ import SampleListStore  from "Store/SampleListStore"
               .attr("r", 2)
               .attr("transform", transform_sample)
               .style("fill", (d) => d.color )
-              .on("click", (d) => self.setStore(d.SampleID))
+              .on("click", (d) => {
+                self.setTabStore("info")
+                self.setStore(d.SampleID)
+              })
 
           function zoom() {
             svg.attr("transform", d3.event.transform);
@@ -129,12 +136,14 @@ import SampleListStore  from "Store/SampleListStore"
 
     this.on("mount", ()=>{
       const sampleIDAction = new SampleIDAction();
-      // D3の図形を描画する
-      initialize_map()
+      const tabAction = new TabAction();
 
-      // SampleIDをStoreへ代入する挙動を設定する
+      // Storeへ代入する挙動を設定する
       self.setStore = (sample_id) =>{
         sampleIDAction.setStore(sample_id);
+      }
+      self.setTabStore = (tab) => {
+        tabAction.setStore(tab)
       }
       sampleIDAction.resetStore();
 
@@ -168,6 +177,8 @@ import SampleListStore  from "Store/SampleListStore"
           ;
         }
       })
+      // D3の図形を描画する
+      initialize_map()
     })
   </script>
 </my-map>
