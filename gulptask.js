@@ -63,7 +63,7 @@ gulp.task("concat:css", () => gulp
       .pipe(gulp.dest("dist"))
 );
 
-gulp.task("build:js", gulp.series(
+gulp.task("build:mainjs", gulp.series(
     gulp.parallel(
         // Riot.jsのtagファイルをECMA6へコンパイルする
         ()=> gulp
@@ -122,6 +122,15 @@ gulp.task("build:js", gulp.series(
         .pipe(gulpUglify())
         .pipe(gulpRename({ extname: ".min.js" }))
         .pipe(gulp.dest("temp/dist")),
+    // 最小化したjsをdistに移動する
+    ()=> gulp
+        .src([
+          "temp/dist/main.min.js"
+        ])
+        .pipe(gulp.dest("dist"))
+));
+
+gulp.task("build:libjs", gulp.series(
     // bowerで入れたファイルを最小化する
     ()=> {
       const jsFilter = gulpFilter("**/*.js", {restore:true});
@@ -138,7 +147,7 @@ gulp.task("build:js", gulp.series(
         .pipe(gulpRename({ extname: ".min.js"}))
         .pipe(gulp.dest("./temp/dist"))
     },
-    // 最小化されたmain.jsと関連するbowerで入れたライブラリを結合して出力する
+    // bowerで入れたライブラリを結合して出力する
     // 依存関係を明示的に示すために手で書いている(gulp-orderでは上手く行かなかった。)
     ()=> gulp
         .src([
@@ -148,9 +157,8 @@ gulp.task("build:js", gulp.series(
           "temp/dist/d3.min.js",
           "temp/dist/riot.min.js",
           "temp/dist/fetch.min.js",
-          "temp/dist/main.min.js",
         ])
-        .pipe(gulpConcat({ path: "index.js" }))
+        .pipe(gulpConcat({ path: "library.min.js" }))
         .pipe(gulp.dest("dist")),
 ));
 
@@ -171,9 +179,9 @@ gulp.task("move_data", () => {
 });
 
 gulp.task("build", gulp.series(
-    gulpClean(["temp", "dist/*.html", "dist/*.js", "dist/*.css"]),
+    gulpClean(["temp", "dist/*.html", "dist/main.min.js", "dist/*.css"]),
     gulp.parallel(
-        gulp.task("build:js"),
+        gulp.task("build:mainjs"),
         gulp.task("build:html"),
     ),
     gulp.task("select:css"),
@@ -184,7 +192,8 @@ gulp.task("build", gulp.series(
 gulp.task("full_build", gulp.series(
     gulpClean(["temp", "dist"]),
     gulp.parallel(
-        gulp.task("build:js"),
+        gulp.task("build:mainjs"),
+        gulp.task("build:libjs"),
         gulp.task("build:html"),
         gulp.task("move_data"),
     ),
