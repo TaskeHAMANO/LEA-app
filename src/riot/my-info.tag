@@ -32,15 +32,15 @@ import SampleTopicAction from "Action/SampleTopicStoreAction"
     }
   </style>
   <script>
+    var self = this;
     this.on("mount", ()=>{
-      var self = this;
       const sampleTopicAction = new SampleTopicAction();
       self.setStore = (topic_data) => {
         sampleTopicAction.setStore(topic_data)
       }
       sampleTopicAction.resetStore();
 
-      // Dispatcherから発火が伝えられたら動作開始
+      // SampleIDの変更が伝えられたら動作開始
       SampleIDStore.on(SampleIDStore.ActionTypes.changed, ()=>{
         self.sample_id = SampleIDStore.sample_id;
         fetch(`http://localhost:5000/sample/${this.sample_id}/metadata`)
