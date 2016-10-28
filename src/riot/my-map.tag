@@ -151,6 +151,9 @@ import SampleListStore  from "Store/SampleListStore"
       SampleListStore.on(SampleListStore.ActionTypes.changed, ()=>{
         let sample_list = SampleListStore.sample_list;
         let candidate = sample_list.map((d)=>d.sample_id);
+        let sample_value = sample_list.reduce((object, d, index)=>{
+          object[d.sample_id] = d.value ;
+        }, {})
 
         if(candidate.length !== 0){
           d3.selectAll(".dot")
