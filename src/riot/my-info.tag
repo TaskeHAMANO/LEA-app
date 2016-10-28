@@ -1,4 +1,5 @@
 import SampleIDStore from "Store/SampleIDStore"
+import SampleTopicStore from "Store/SampleTopicStore"
 import SampleTopicAction from "Action/SampleTopicStoreAction"
 
 <my-info>
@@ -15,7 +16,7 @@ import SampleTopicAction from "Action/SampleTopicStoreAction"
         <div id="taxon_chart" if={taxon_list}><my-bar data={taxon_list}></my-bar></div>
       </div>
       <div class="col-lg-6">
-        <div id="topic_chart"><my-bar></my-bar></div>
+        <div id="topic_chart" if={topic_list}><my-bar data={topic_list} element_name={topic_element_name}></my-bar></div>
       </div>
     </div>
   </div>
@@ -56,9 +57,14 @@ import SampleTopicAction from "Action/SampleTopicStoreAction"
             let topic_list = {}
             topic_list[self.sample_id] = json.topic_list ;
             self.setStore(topic_list)
-            self.update()
           })
       });
+
+      SampleTopicStore.on(SampleTopicStore.ActionTypes.changed, ()=>{
+        self.topic_list = SampleTopicStore.topic_data ;
+        self.topic_element_name = "topic_id" ;
+        self.update();
+      })
     });
   </script>
 

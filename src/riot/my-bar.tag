@@ -1,19 +1,23 @@
-import SampleTopicAction from "Action/SampleTopicStoreAction"
-import SampleTopicStore from 'Store/SampleTopicStore'
-
 <my-bar>
   <div id="d3-chart"></div>
 
   <script>
+    var self = this;
     this.on("mount", ()=>{
-      SampleTopicStore.on(SampleTopicStore.ActionTypes.changed, ()=>{
-        this.topic_data = SampleTopicStore.topic_data;
-        d3.select("#d3-chart svg").remove();
-        visualize_bar_chart(this.topic_data);
+      self.topic_data = opts.data ;
+      self.element_name = opts.element_name ;
+      visualize_bar_chart(self.topic_data, self.element_name);
+
+      // マウントされたあとはupdateを検知するようにする
+      self.on("updated", () => {
+        self.topic_data = opts.data ;
+        self.element_name = opts.element_name ;
+        d3.select("#d3-chart svg").remove()
+        visualize_bar_chart(self.topic_data, self.element_name);
       })
     })
 
-    function visualize_bar_chart(data){
+    function visualize_bar_chart(data, element_name){
       let chart_div = d3.select("#d3-chart");
       // 大きさの取得のためにcontentのDOMを指定
       let content = d3.select(".content")
@@ -37,7 +41,6 @@ import SampleTopicStore from 'Store/SampleTopicStore'
       let y = d3.scaleLinear()
         .rangeRound([bar_height, 0]);
       let z = d3.scaleOrdinal(d3.schemeCategory10);
-      let element_name = "topic_id" ;
       let sample_list = []
       for (let key in data){
         sample_list.push(key)
@@ -45,7 +48,7 @@ import SampleTopicStore from 'Store/SampleTopicStore'
       let element_list = data[sample_list[0]].map((e) => e[element_name])
 
       x.domain(sample_list);
-      // 得られたJSONから、valueの最大値を取得す
+      // 得られたJSONから、valueの最大値を取得する
       y.domain([0, 0.99 * d3.max(sample_list.map((key) => d3.sum(data[key].map((obj) => obj.value))))]).nice();
       z.domain(element_list);
       // dataをd3.stackを使える形式に変換する
@@ -90,7 +93,7 @@ import SampleTopicStore from 'Store/SampleTopicStore'
         .attr("dy", "0.35em")
         .attr("text-anchor", "start")
         .attr("fill", "#000")
-        .text("Abundance") ; 
+        .text("Abundance") ;
     }
   </script>
 </my-bar>
