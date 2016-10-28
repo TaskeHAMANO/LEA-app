@@ -153,6 +153,7 @@ import SampleListStore  from "Store/SampleListStore"
         let candidate = sample_list.map((d)=>d.sample_id);
         let sample_value = sample_list.reduce((object, d, index)=>{
           object[d.sample_id] = d.value ;
+          return object
         }, {})
 
         if(candidate.length !== 0){
@@ -160,8 +161,11 @@ import SampleListStore  from "Store/SampleListStore"
             .filter((d) => candidate.includes(d.SampleID))
             .transition()
             .duration(1000)
+            .attr("r", (d) => {
+              return sample_value[d.SampleID] + 1 * 2
+            })
             .style("fill", (d) => {
-              return d3.color(d.color).brighter(1.5)
+              return d3.color(d.color).brighter(sample_value[d.SampleID] + 1)
             })
             .style("visibility", "visible")
           ;
@@ -175,6 +179,7 @@ import SampleListStore  from "Store/SampleListStore"
           d3.selectAll(".dot")
             .transition()
             .duration(1000)
+            .attr("r", 2)
             .style("fill", (d) => d3.color(d.color))
             .style("visibility", "visible")
           ;
