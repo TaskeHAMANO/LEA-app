@@ -153,6 +153,7 @@ import SampleListStore  from "Store/SampleListStore"
         let candidate = sample_list.map((d)=>d.sample_id);
         let sample_value = sample_list.reduce((object, d, index)=>{
           object[d.sample_id] = d.value ;
+          return object
         }, {})
 
         if(candidate.length !== 0){
