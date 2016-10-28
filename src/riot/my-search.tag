@@ -34,7 +34,7 @@ import SampleListAction from "Action/SampleListStoreAction"
 
     this.submit = function(){
       if(this.searched_text.value.length !== 0){
-        fetch(`http://localhost:5000/string/${this.searched_text.value}/samples?n_limit=500`)
+        fetch(`http://localhost:5000/string/${encodeURIComponent(this.searched_text.value)}/samples?n_limit=500`)
           .then((response) => response.json())
           .then((json) => {
             self.setStore(json.sample_list)
