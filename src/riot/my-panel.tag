@@ -31,16 +31,16 @@ import TabAction  from "Action/TabStoreAction"
     var self = this;
     this.on("mount", () => {
       const tabAction = new TabAction();
+      self.setStore = (tab) => {
+        tabAction.setStore(tab);
+      }
+      tabAction.resetStore();
 
       TabStore.on(TabStore.ActionTypes.changed, () => {
         self.activeTab = TabStore.tab;
         self.update();
       })
 
-      self.setStore = (tab) => {
-        tabAction.setStore(tab);
-      }
-      tabAction.resetStore();
       self.activeTab = TabStore.tab;
       self.update();
     })
