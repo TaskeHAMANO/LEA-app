@@ -34,7 +34,7 @@ import SampleListAction from "Action/SampleListStoreAction"
   </div>
 
   <script>
-    var self = this
+    var self = this ;
     this.on("mount", ()=>{
       const sampleListAction = new SampleListAction();
 
@@ -55,9 +55,9 @@ import SampleListAction from "Action/SampleListStoreAction"
 
     this.reset = function(){
       this.searched_text.value = "" ;
-      this.eco_topic_list = [];
-      this.sem_topic_list = [];
-      self.resetStore();
+      this.eco_topic_list = [] ;
+      this.sem_topic_list = [] ;
+      self.resetStore() ;
     }
 
     this.submit = function(){
