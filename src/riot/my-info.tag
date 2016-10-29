@@ -1,6 +1,4 @@
-import SampleIDStore from "Store/SampleIDStore"
-import SampleTopicStore from "Store/SampleTopicStore"
-import SampleTopicAction from "Action/SampleTopicStoreAction"
+import SampleIDStore      from "Store/SampleIDStore"
 
 <my-info>
   <div class="container-fluid">
@@ -13,10 +11,14 @@ import SampleTopicAction from "Action/SampleTopicStoreAction"
     </div>
     <div class="row row-chart">
       <div class="col-lg-6">
-        <div id="taxon_chart" if={taxon_list}><my-bar data={taxon_list}></my-bar></div>
+        <div id="taxon_chart" if={taxon_list}>
+          <my-bar data={taxon_list} element_name={taxon_element_name} chart_id="taxon_bar_chart"></my-bar>
+        </div>
       </div>
       <div class="col-lg-6">
-        <div id="topic_chart" if={topic_list}><my-bar data={topic_list} element_name={topic_element_name}></my-bar></div>
+        <div id="topic_chart" if={topic_list}>
+          <my-bar data={topic_list} element_name={topic_element_name} chart_id="topic_bar_chart"></my-bar>
+        </div>
       </div>
     </div>
   </div>
@@ -35,11 +37,8 @@ import SampleTopicAction from "Action/SampleTopicStoreAction"
   <script>
     var self = this;
     this.on("mount", ()=>{
-      const sampleTopicAction = new SampleTopicAction();
-      self.setStore = (topic_data) => {
-        sampleTopicAction.setStore(topic_data)
-      }
-      sampleTopicAction.resetStore();
+      self.topic_element_name = "topic_id" ;
+      self.taxon_element_name = "taxonomy_name" ;
 
       // SampleIDの変更が伝えられたら動作開始
       SampleIDStore.on(SampleIDStore.ActionTypes.changed, ()=>{
@@ -51,20 +50,24 @@ import SampleTopicAction from "Action/SampleTopicStoreAction"
             self.sample_url = json.metadata.SampleURL;
             self.update()
           });
+        fetch(`http://localhost:5000/sample/${this.sample_id}/taxonomies/genus`)
+          .then((response)=>response.json())
+          .then((json)=>{
+            let taxon_list = {}
+            taxon_list[self.sample_id] = json.taxonomy_list ;
+            self.taxon_list = taxon_list ;
+            self.update();
+          })
         fetch(`http://localhost:5000/sample/${this.sample_id}/topics`)
           .then((response)=>response.json())
           .then((json)=>{
             let topic_list = {}
             topic_list[self.sample_id] = json.topic_list ;
-            self.setStore(topic_list)
+            self.topic_list = topic_list ;
+            self.update();
           })
       });
 
-      SampleTopicStore.on(SampleTopicStore.ActionTypes.changed, ()=>{
-        self.topic_list = SampleTopicStore.topic_data ;
-        self.topic_element_name = "topic_id" ;
-        self.update();
-      })
     });
   </script>
 

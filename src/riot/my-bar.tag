@@ -1,5 +1,5 @@
 <my-bar>
-  <div id="d3-chart"></div>
+  <div class="d3-chart" id={opts.chart_id}></div>
 
   <script>
     var self = this;
@@ -12,13 +12,13 @@
       self.on("updated", () => {
         self.topic_data = opts.data ;
         self.element_name = opts.element_name ;
-        d3.select("#d3-chart svg").remove()
+        d3.select(`#${opts.chart_id} svg`).remove()
         visualize_bar_chart(self.topic_data, self.element_name);
       })
     })
 
     function visualize_bar_chart(data, element_name){
-      let chart_div = d3.select("#d3-chart");
+      let chart_div = d3.select(`#${opts.chart_id}`);
       // 大きさの取得のためにcontentのDOMを指定
       let content = d3.select(".content")
       // 大きさの指定
