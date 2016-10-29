@@ -1,6 +1,6 @@
 import SampleIDAction   from "Action/SampleIDStoreAction"
-import TabAction      from "Action/TabStoreAction"
 import SampleListStore  from "Store/SampleListStore"
+import TabAction        from "Action/TabStoreAction"
 
 <my-map>
   <div class="d3-map"></div>
@@ -18,10 +18,12 @@ import SampleListStore  from "Store/SampleListStore"
 
     function initialize_map(){
       d3.queue()
-        .defer(d3.csv, "data/data.csv")
-        .defer(d3.csv, "data/topics.csv")
+        .defer(d3.json, "http://localhost:5000/sample/location")
+        .defer(d3.json, "http://localhost:5000/topic/location")
         .await((error, data, topic_data) =>{
           if (error) throw error
+          data = data.sample_list ;
+          topic_data = topic_data.topic_list ;
           //Convert type to number
           data.forEach((d) => {
             d.x = +d.x;
@@ -87,7 +89,7 @@ import SampleListStore  from "Store/SampleListStore"
               .data(topic_data)
             .enter().append("image")
               .classed("topicimage", true)
-              .attr("xlink:href", (d) => d.src)
+              .attr("xlink:href", (d) => `./data/${d.topic_id}.png`)
               .attr("width", topic_width)
               .attr("height", topic_height)
               .attr("transform", transform_topic)
@@ -107,7 +109,7 @@ import SampleListStore  from "Store/SampleListStore"
               .style("fill", (d) => d.color )
               .on("click", (d) => {
                 self.setTabStore("info")
-                self.setStore(d.SampleID)
+                self.setStore(d.sample_id)
               })
 
           function zoom() {
@@ -162,15 +164,15 @@ import SampleListStore  from "Store/SampleListStore"
             .transition()
             .duration(1000)
             .attr("r", (d) => {
-              return sample_value[d.SampleID] + 1 * 2
+              return sample_value[d.sample_id] + 1 * 2
             })
             .style("fill", (d) => {
-              return d3.color(d.color).brighter(sample_value[d.SampleID] + 1)
+              return d3.color(d.color).brighter(sample_value[d.sample_id] + 1)
             })
             .style("visibility", "visible")
           ;
           d3.selectAll(".dot")
-            .filter((d) => !(candidate.includes(d.SampleID)))
+            .filter((d) => !(candidate.includes(d.sample_id)))
             .transition()
             .duration(1000)
             .style("visibility", "hidden")
