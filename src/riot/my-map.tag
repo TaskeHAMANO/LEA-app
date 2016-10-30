@@ -160,7 +160,7 @@ import TabAction        from "Action/TabStoreAction"
 
         if(candidate.length !== 0){
           d3.selectAll(".dot")
-            .filter((d) => candidate.includes(d.SampleID))
+            .filter((d) => candidate.includes(d.sample_id))
             .transition()
             .duration(1000)
             .attr("r", (d) => {
