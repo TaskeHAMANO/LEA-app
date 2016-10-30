@@ -1,6 +1,28 @@
 <my-bar>
-  <div class="d3-chart" id={opts.chart_id}></div>
+  <div id={opts.chart_id}>
+    <div class="d3-chart"></div>
+    <div class="d3-tooltip"></div>
+  </div>
 
+  <style scoped>
+    div.d3-chart {
+      z-index:0 ;
+    }
+    div.d3-tooltip {
+      z-index:1 ;
+      box-sizing: border-box;
+      display: inline;
+      text-align: center;
+      padding: 2px;
+      font: 12px sans-serif;
+      inline-height: 1;
+      background: black;
+      color: white;
+      position: absolute ;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+  </style>
   <script>
     var self = this;
     this.on("mount", ()=>{
@@ -12,13 +34,13 @@
       self.on("updated", () => {
         self.topic_data = opts.data ;
         self.element_name = opts.element_name ;
-        d3.select(`#${opts.chart_id} svg`).remove()
+        d3.select(`#${opts.chart_id} .d3-chart svg`).remove()
         visualize_bar_chart(self.topic_data, self.element_name);
       })
     })
 
     function visualize_bar_chart(data, element_name){
-      let chart_div = d3.select(`#${opts.chart_id}`);
+      let chart_div = d3.select(`#${opts.chart_id} .d3-chart`);
       // 大きさの取得のためにcontentのDOMを指定
       let content = d3.select(".content")
       // 大きさの指定
@@ -63,6 +85,9 @@
       let stack = d3.stack()
         .keys(element_list) ;
 
+      let tip = d3.select(`#${opts.chart_id} .d3-tooltip`)
+        .style("visibility", "hidden");
+
       // 積み上げ棒グラフの作成
       svg.selectAll(".serie")
         .data(stack(data))
@@ -70,6 +95,16 @@
         .append("g")
           .attr("class", "serie")
           .attr("fill", (d) => z(d.key))
+          .on("mouseover", (d) =>{
+            console.log(d3.event);
+            tip.style("visibility", "visible")
+              .style("left", (d3.event.layerX)+"px")
+              .style("top", (d3.event.layerY)+"px")
+              .html(() => `<p>${element_name}: ${d.key}</p>`) ;
+          })
+          .on("mouseout", (d) =>{
+            tip.style("visibility", "hidden")
+          })
         .selectAll("rect")
         .data((d)=>d)
         .enter()
@@ -77,7 +112,8 @@
           .attr("x", (d) => x(d.data.sample_id))
           .attr("y", (d) => y(d[1]))
           .attr("height", (d) => (y(d[0]) - y(d[1])))
-          .attr("width", x.bandwidth()) ;
+          .attr("width", x.bandwidth())
+          ;
 
       svg.append("g")
         .attr("class", "axis axis--x")

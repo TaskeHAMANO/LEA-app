@@ -27,12 +27,6 @@ import SampleIDStore      from "Store/SampleIDStore"
     .container-extend {
       height:100%;
     }
-    .row-metadata {
-      height:30%;
-    }
-    .row-chart {
-      height:70%;
-    }
   </style>
   <script>
     var self = this;
