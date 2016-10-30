@@ -79,6 +79,9 @@ import TabAction        from "Action/TabStoreAction"
           x.domain([xMin, xMax]);
           y.domain([yMin, yMax]);
 
+          let current_url = window.location.href;
+          let current_domain = current_url.replace(/index.html/g, "/data")
+
           // topicを追加する
           let topics = svg.append("g")
               .classed("topics", true)
@@ -89,7 +92,7 @@ import TabAction        from "Action/TabStoreAction"
               .data(topic_data)
             .enter().append("image")
               .classed("topicimage", true)
-              .attr("xlink:href", (d) => `./data/${d.topic_id}.png`)
+              .attr("xlink:href", (d) => `${current_domain}/${d.topic_id}.png`)
               .attr("width", topic_width)
               .attr("height", topic_height)
               .attr("transform", transform_topic)
