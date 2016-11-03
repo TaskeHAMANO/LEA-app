@@ -23,57 +23,58 @@
       pointer-events: none;
     }
   </style>
+
   <script>
     var self = this;
     this.on("mount", ()=>{
-      self.topic_data = opts.data ;
-      self.element_name = opts.element_name ;
-      visualize_bar_chart(self.topic_data, self.element_name);
+      let data = opts.data ;
+      let element_name = opts.element_name ;
+      let chart_id = opts.chart_id ;
+      let color = opts.color ;
+      visualize_bar_chart(data, element_name, chart_id, color);
 
-      // マウントされたあとはupdateを検知するようにする
       self.on("updated", () => {
-        self.topic_data = opts.data ;
-        self.element_name = opts.element_name ;
-        d3.select(`#${opts.chart_id} .d3-chart svg`).remove()
-        visualize_bar_chart(self.topic_data, self.element_name);
+        let data = opts.data ;
+        let element_name = opts.element_name ;
+        let chart_id = opts.chart_id
+        let color = opts.color ;
+        d3.select(`#${chart_id} .d3-chart svg`).remove()
+        visualize_bar_chart(data, element_name, chart_id, color);
       })
     })
 
-    function visualize_bar_chart(data, element_name){
-      let chart_div = d3.select(`#${opts.chart_id} .d3-chart`);
-      // 大きさの取得のためにcontentのDOMを指定
+    function visualize_bar_chart(data, element_name, chart_id, color){
+      let chart_div = d3.select(`#${chart_id} .d3-chart`);
       let content = d3.select(".content")
-      // 大きさの指定
       let svg_width = content.node().getBoundingClientRect().width / 2 - 30;
-      let svg_height = content.node().getBoundingClientRect().height - d3.select(".row-metadata").node().getBoundingClientRect().height;
+      let svg_height = content.node().getBoundingClientRect().height - d3.select(".row-metadata").node().getBoundingClientRect().height - 52 - 10 ;
       let bar_width = svg_width * 0.9 ;
       let bar_height = svg_height * 0.9;
-      let margin = {top:30, bottom:0, left:30, right:0}
-      // svg領域の付加
+      let margin = {top:10, bottom:0, left:30, right:0}
       let svg = chart_div.append("svg")
           .attr("width", svg_width)
           .attr("height", svg_height)
         .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top +")");
-      // 軸の大きさの指定
-      let x = d3.scaleBand()
-        .rangeRound([0, bar_width])
-        .padding(0.1)
-        .align(0.1);
-      let y = d3.scaleLinear()
-        .rangeRound([bar_height, 0]);
-      let z = d3.scaleOrdinal(d3.schemeCategory10);
       let sample_list = []
       for (let key in data){
         sample_list.push(key)
       }
       let element_list = data[sample_list[0]].map((e) => e[element_name])
 
+      let x = d3.scaleBand()
+        .rangeRound([0, bar_width])
+        .padding(0.1)
+        .align(0.1);
       x.domain(sample_list);
-      // 得られたJSONから、valueの最大値を取得する
+      let y = d3.scaleLinear()
+        .rangeRound([bar_height, 0]);
       y.domain([0, 0.99 * d3.max(sample_list.map((key) => d3.sum(data[key].map((obj) => obj.value))))]).nice();
+      let z = d3.scaleOrdinal(d3.schemeCategory10);
       z.domain(element_list);
-      // dataをd3.stackを使える形式に変換する
+      if(typeof color != "undefined"){
+        let z = function(d){return color[d]} ;
+      }
       data = sample_list.map((key) =>{
         let obj = {sample_id: key}
         data[key].forEach((e)=>{
@@ -81,14 +82,12 @@
         })
         return obj;
       })
-      // stackの様式を設定する
       let stack = d3.stack()
         .keys(element_list) ;
 
-      let tip = d3.select(`#${opts.chart_id} .d3-tooltip`)
+      let tip = d3.select(`#${chart_id} .d3-tooltip`)
         .style("visibility", "hidden");
 
-      // 積み上げ棒グラフの作成
       svg.selectAll(".serie")
         .data(stack(data))
         .enter()
@@ -96,7 +95,6 @@
           .attr("class", "serie")
           .attr("fill", (d) => z(d.key))
           .on("mouseover", (d) =>{
-            console.log(d3.event);
             tip.style("visibility", "visible")
               .style("left", (d3.event.layerX)+"px")
               .style("top", (d3.event.layerY)+"px")
