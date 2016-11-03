@@ -24,7 +24,6 @@ import TabAction        from "Action/TabStoreAction"
           if (error) throw error
           data = data.sample_list ;
           topic_data = topic_data.topic_list ;
-          //Convert type to number
           data.forEach((d) => {
             d.x = +d.x;
             d.y = +d.y;
@@ -55,7 +54,6 @@ import TabAction        from "Action/TabStoreAction"
             .append("g")
           ;
 
-          // ダウンロード時を想定して、背景用の四角形を作る
           svg.append("rect")
             .attr("width", "100%")
             .attr("height", "100%")
@@ -82,7 +80,6 @@ import TabAction        from "Action/TabStoreAction"
           let current_url = window.location.href;
           let current_domain = current_url.replace(/index.html/g, "/data")
 
-          // topicを追加する
           let topics = svg.append("g")
               .classed("topics", true)
               .attr("width", "100%")
@@ -97,7 +94,6 @@ import TabAction        from "Action/TabStoreAction"
               .attr("height", topic_height)
               .attr("transform", transform_topic)
 
-          // sampleを追加する
           let samples = svg.append("g")
               .classed("samples", true)
               .attr("width", "100%")
@@ -143,7 +139,6 @@ import TabAction        from "Action/TabStoreAction"
       const sampleIDAction = new SampleIDAction();
       const tabAction = new TabAction();
 
-      // Storeへ代入する挙動を設定する
       self.setStore = (sample_id) =>{
         sampleIDAction.setStore(sample_id);
       }
@@ -152,7 +147,6 @@ import TabAction        from "Action/TabStoreAction"
       }
       sampleIDAction.resetStore();
 
-      // SampleListのStoreが変更された際の挙動を記述
       SampleListStore.on(SampleListStore.ActionTypes.changed, ()=>{
         let sample_list = SampleListStore.sample_list;
         let candidate = sample_list.map((d)=>d.sample_id);
@@ -161,16 +155,19 @@ import TabAction        from "Action/TabStoreAction"
           return object
         }, {})
 
+        let color = d3.scaleSequential((t) => {
+          let v = Math.pow(t, 4)
+          return d3.rgb(v*255, v*255, v*255) + ""
+        });
+        color.domain([0,1])
+
         if(candidate.length !== 0){
           d3.selectAll(".dot")
             .filter((d) => candidate.includes(d.sample_id))
             .transition()
             .duration(1000)
-            .attr("r", (d) => {
-              return sample_value[d.sample_id] + 1 * 2
-            })
             .style("fill", (d) => {
-              return d3.color(d.color).brighter(sample_value[d.sample_id] + 1)
+              return color(sample_value[d.sample_id])
             })
             .style("visibility", "visible")
           ;
@@ -184,13 +181,11 @@ import TabAction        from "Action/TabStoreAction"
           d3.selectAll(".dot")
             .transition()
             .duration(1000)
-            .attr("r", 2)
             .style("fill", (d) => d3.color(d.color))
             .style("visibility", "visible")
           ;
         }
       })
-      // D3の図形を描画する
       initialize_map()
     })
   </script>
