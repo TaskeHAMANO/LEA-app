@@ -1,6 +1,7 @@
 import SampleIDAction   from "Action/SampleIDStoreAction"
-import SampleListStore  from "Store/SampleListStore"
 import TabAction        from "Action/TabStoreAction"
+import SampleListStore  from "Store/SampleListStore"
+import UserSampleListStore from "Store/UserSampleListStore"
 
 <my-map>
   <div class="d3-map"></div>
@@ -22,7 +23,7 @@ import TabAction        from "Action/TabStoreAction"
         .defer(d3.json, "http://localhost:5000/topic/location")
         .await((error, data, topic_data) =>{
           if (error) throw error
-          data = data.sample_list ;
+          data = data.sample_list.slice(0,100) ;
           topic_data = topic_data.topic_list ;
           data.forEach((d) => {
             d.x = +d.x;
@@ -64,9 +65,9 @@ import TabAction        from "Action/TabStoreAction"
             topic_width = 60,
             topic_height = 60;
 
-          let x = d3.scaleLinear()
+          self.x = d3.scaleLinear()
             .range([0, svg_width]).nice();
-          let y = d3.scaleLinear()
+          self.y = d3.scaleLinear()
             .range([svg_height, 0]).nice();
 
           let xMax = d3.max(data, (d) => d.x ) * 1.10,
@@ -74,8 +75,8 @@ import TabAction        from "Action/TabStoreAction"
               yMax = d3.max(data, (d) => d.y ) * 1.10,
               yMin = d3.min(data, (d) => d.y ) * 1.10;
 
-          x.domain([xMin, xMax]);
-          y.domain([yMin, yMax]);
+          self.x.domain([xMin, xMax]);
+          self.y.domain([yMin, yMax]);
 
           let current_url = window.location.href;
           let current_domain = current_url.replace(/index.html/g, "/data")
@@ -127,10 +128,10 @@ import TabAction        from "Action/TabStoreAction"
             ;
           }
           function transform_sample(d) {
-            return "translate(" + x(d.x) + "," + y(d.y) + ")";
+            return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")";
           }
           function transform_topic(d) {
-            return "translate(" + (x(d.x) - topic_height/2) + "," + (y(d.y) - topic_height/2) + ")";
+            return "translate(" + (self.x(d.x) - topic_height/2) + "," + (self.y(d.y) - topic_height/2) + ")";
           }
       });
     }
@@ -147,6 +148,33 @@ import TabAction        from "Action/TabStoreAction"
       }
       sampleIDAction.resetStore();
 
+      // ユーザ入力が変更されたら描画
+      UserSampleListStore.on(UserSampleListStore.ActionTypes.changed, ()=>{
+        let user_sample_list = UserSampleListStore.user_sample_list;
+        let svg = d3.select(".d3-map svg g")
+        let samples = svg.append("g")
+          .classed("user_samples", true)
+          .attr("width", "100%")
+          .attr("height", "100%")
+          .selectAll(".user")
+          .data(user_sample_list);
+
+        samples.enter()
+          .append("path")
+          .classed("cross", true)
+          .classed("user", true)
+          .attr("d", d3.symbol().size(30).type(d3.symbolCross))
+          .attr("transform", (d) => "translate(" + self.x(d.x) + "," + self.y(d.y) +")")
+          .style("fill", "white")
+          .on("click", (d) => {
+            self.setTabStore("info")
+            self.setStore(d.sample_id)
+          });
+        samples.exit()
+          .remove();
+      })
+
+      // 検索サンプルが変更されたら描画
       SampleListStore.on(SampleListStore.ActionTypes.changed, ()=>{
         let sample_list = SampleListStore.sample_list;
         let candidate = sample_list.map((d)=>d.sample_id);
@@ -164,8 +192,6 @@ import TabAction        from "Action/TabStoreAction"
         if(candidate.length !== 0){
           d3.selectAll(".dot")
             .filter((d) => candidate.includes(d.sample_id))
-            .transition()
-            .duration(1000)
             .style("fill", (d) => {
               return color(sample_value[d.sample_id])
             })
@@ -173,15 +199,17 @@ import TabAction        from "Action/TabStoreAction"
           ;
           d3.selectAll(".dot")
             .filter((d) => !(candidate.includes(d.sample_id)))
-            .transition()
-            .duration(1000)
+            .style("visibility", "hidden")
+          ;
+          d3.selectAll(".cross")
             .style("visibility", "hidden")
           ;
         }else{
           d3.selectAll(".dot")
-            .transition()
-            .duration(1000)
             .style("fill", (d) => d3.color(d.color))
+            .style("visibility", "visible")
+          ;
+          d3.selectAll(".cross")
             .style("visibility", "visible")
           ;
         }
