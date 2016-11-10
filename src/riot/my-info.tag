@@ -1,14 +1,28 @@
-import SampleIDStore      from "Store/SampleIDStore"
+import SelectInfoStore      from "Store/SelectInfoStore"
 
 <my-info>
   <div class="container-fluid">
-    <div class="row row-metadata">
-      <div class="col-lg-12">
-        <div if={metadata}>
-          <h3>Metadata</h3>
-          <h4> Sample ID:</h4> {metadata.sample_id}
-          <h4> Sample Name:</h4> {metadata.sample_name}
-          <h4> NCBI:</h4> <a href={metadata.sample_url}>Link</a>
+    <div if={metadata.sample_id} class="row-metadata">
+      <div class="row">
+        <h3>Sample metadata</h3>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <h4> Sample ID: </h4> {metadata.sample_id}
+          <div if={ metadata.sample_name }>
+            <h4> Sample Name: </h4> {metadata.sample_name}
+          </div>
+          <div if={ metadata.project_id }>
+            <h4> Project ID: </h4> {metadata.project_id}
+          </div>
+        </div>
+      </div>
+      <div class="row" if={ metadata.sample_mdb_url && metadata.sample_ncbi_url }>
+        <div class="col-lg-6">
+          <h4> MicrobeDB.jp: </h4> <a href={metadata.sample_mdb_url}>Link</a>
+        </div>
+        <div class="col-lg-6">
+          <h4> NCBI: </h4> <a href={metadata.sample_ncbi_url}>Link</a>
         </div>
       </div>
     </div>
@@ -47,29 +61,56 @@ import SampleIDStore      from "Store/SampleIDStore"
       })
     self.taxon_color = undefined ;
 
-    this.on("mount", ()=>{
+    self.has_project_id = () => self.metadata.hasOwnProperty("project_id")
+
+    self.on("mount", ()=>{
       self.topic_element_name = "topic_id" ;
       self.taxon_element_name = "taxonomy_name" ;
 
-      SampleIDStore.on(SampleIDStore.ActionTypes.changed, ()=>{
+      SelectInfoStore.on(SelectInfoStore.ActionTypes.changed, ()=>{
         self.metadata = {}
-        self.metadata["sample_id"] = SampleIDStore.sample_id;
-        d3.queue()
-          .defer(d3.json, `http://localhost:5000/sample/${this.metadata.sample_id}/metadata`)
-          .defer(d3.json, `http://localhost:5000/sample/${this.metadata.sample_id}/taxonomies/genus`)
-          .defer(d3.json, `http://localhost:5000/sample/${this.metadata.sample_id}/topics`)
-          .await((error, metadata, taxon, topics) => {
-            if (error) throw error
-            self.metadata["sample_name"] = metadata.metadata.SampleName;
-            self.metadata["sample_url"] = metadata.metadata.SampleURL;
-            let taxon_list = {}
-            taxon_list[self.metadata.sample_id] = taxon.taxonomy_list ;
-            self.taxon_list = taxon_list ;
-            let topic_list = {}
-            topic_list[self.metadata.sample_id] = topics.topic_list ;
-            self.topic_list = topic_list ;
-            self.update();
-          })
+        self.metadata = SelectInfoStore.select_info;
+        if (self.has_project_id() == false){
+          d3.queue()
+            .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/metadata`)
+            .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/taxonomies/genus`)
+            .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/topics`)
+            .await((error, metadata, taxon, topics) => {
+              if (error) throw error
+
+              self.metadata["sample_name"] = metadata.metadata.SampleName;
+              self.metadata["sample_ncbi_url"] = `http://ncbi.nlm.nih.gov/sra/${self.metadata.sample_id}`;
+              self.metadata["sample_mdb_url"] = `http://biointegra.jp/MDBdemo/search/?q1=${self.metadata.sample_id}&q1_cat=sample&q1_param_srs_id=${self.metadata.sample_id}` ;
+
+              let taxon_list = {}
+              taxon_list[self.metadata.sample_id] = taxon.taxonomy_list ;
+              self.taxon_list = taxon_list ;
+
+              let topic_list = {}
+              topic_list[self.metadata.sample_id] = topics.topic_list ;
+              self.topic_list = topic_list ;
+
+              self.update();
+            })
+        }else{
+          d3.queue()
+            .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/taxonomies/genus`)
+            .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/topics`)
+            .await((error, taxon, topics) => {
+              if (error) throw error
+
+              let taxon_list = {}
+              taxon_list[self.metadata.sample_id] = taxon.taxonomy_list ;
+              self.taxon_list = taxon_list ;
+
+              let topic_list = {}
+              topic_list[self.metadata.sample_id] = topics.topic_list ;
+              self.topic_list = topic_list ;
+
+              self.update()
+
+            })
+        }
       });
     });
   </script>

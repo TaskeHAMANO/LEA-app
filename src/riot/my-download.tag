@@ -6,14 +6,14 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
   <button type="button" name="down_png" onclick="{click_png}" class="btn btn-primary btn-block">Download as PNG</button>
   <button type="button" name="down_svg" onclick="{click_svg}" class="btn btn-primary btn-block">Download as SVG</button>
   <h3>Upload</h3>
-  <form onSubmit={submit_single}>
+  <form onSubmit={submit_single} id="upload_single_form">
     <h4>Upload cluster file</h4>
-    <input type="file" id="up_single">
+    <input type="file" id="up_single_file">
     <button type="submit">Submit</button>
   </form>
-  <form onSubmit={submit_multi}>
+  <form onSubmit={submit_multi} id="upload_multi_form">
     <h4>Upload compressed cluster file</h4>
-    <input type="file" id="up_multi">
+    <input type="file" id="up_multi_file">
     <button type="submit">Submit</button>
   </form>
 
@@ -30,38 +30,29 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
       }
 
       self.submit_single = function(){
-        let input_file = document.getElementById("up_single") ;
-        let files = input_file.files ;
+        let input = document.getElementById("up_single_file") ;
         let data = new FormData() ;
-        data.append("cluster_file", files[0]) ;
+        data.append("cluster_file", input.files[0])
         fetch("http://localhost:5000/predict_single", {
-          method:"post",
+          method: "post",
           mode: "cors",
-          headers: new Headers({
-            "Content-Type":"text/plain"
-          }),
-          body:data
+          body: data
         })
         .then((response) => response.json())
         .then((json) => {
-          console.log(json);
           let new_data = json.new_sample_list;
           self.setStore(new_data);
         })
       }
 
-      self.submit_multi= function(){
-        let input_multi_files = document.getElementById("up_multi")
-        let files = input_multi_files.files ;
+      self.submit_multi = function(){
+        let input = document.getElementById("up_single_file") ;
         let data = new FormData() ;
-        data.append("cluster_targz_file", files[0]) ;
+        data.append("cluster_targz_file", input.files[0])
         fetch("http://localhost:5000/predict_multiple", {
-          method:"post",
+          method: "post",
           mode: "cors",
-          headers: new Headers({
-            "Content-Type":"application/x-tar"
-          }),
-          body:data
+          body: data
         })
         .then((response) => response.json())
         .then((json) => {

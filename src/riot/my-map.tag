@@ -1,4 +1,4 @@
-import SampleIDAction   from "Action/SampleIDStoreAction"
+import SelectInfoAction   from "Action/SelectInfoStoreAction"
 import TabAction        from "Action/TabStoreAction"
 import SampleListStore  from "Store/SampleListStore"
 import UserSampleListStore from "Store/UserSampleListStore"
@@ -109,7 +109,7 @@ import UserSampleListStore from "Store/UserSampleListStore"
               .style("fill", (d) => d.color )
               .on("click", (d) => {
                 self.setTabStore("info")
-                self.setStore(d.sample_id)
+                self.setStore({"sample_id": d.sample_id})
               })
 
           function zoom() {
@@ -137,18 +137,17 @@ import UserSampleListStore from "Store/UserSampleListStore"
     }
 
     this.on("mount", ()=>{
-      const sampleIDAction = new SampleIDAction();
+      const selectInfoAction = new SelectInfoAction();
       const tabAction = new TabAction();
 
-      self.setStore = (sample_id) =>{
-        sampleIDAction.setStore(sample_id);
+      self.setStore = (select_info) =>{
+        selectInfoAction.setStore(select_info);
       }
       self.setTabStore = (tab) => {
         tabAction.setStore(tab)
       }
-      sampleIDAction.resetStore();
+      selectInfoAction.resetStore();
 
-      // ユーザ入力が変更されたら描画
       UserSampleListStore.on(UserSampleListStore.ActionTypes.changed, ()=>{
         let user_sample_list = UserSampleListStore.user_sample_list;
         let svg = d3.select(".d3-map svg g")
@@ -168,13 +167,12 @@ import UserSampleListStore from "Store/UserSampleListStore"
           .style("fill", "white")
           .on("click", (d) => {
             self.setTabStore("info")
-            self.setStore(d.sample_id)
+            self.setStore({"sample_id": d.sample_id, "project_id": d.project_id})
           });
         samples.exit()
           .remove();
       })
 
-      // 検索サンプルが変更されたら描画
       SampleListStore.on(SampleListStore.ActionTypes.changed, ()=>{
         let sample_list = SampleListStore.sample_list;
         let candidate = sample_list.map((d)=>d.sample_id);
