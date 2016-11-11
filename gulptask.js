@@ -153,7 +153,6 @@ gulp.task("build:libjs", gulp.series(
         .src([
           "temp/dist/jquery.min.js",
           "temp/dist/bootstrap.min.js",
-          "temp/dist/bootstrap-tokenfield.min.js",
           "temp/dist/d3.min.js",
           "temp/dist/riot.min.js",
           "temp/dist/fetch.min.js",
