@@ -15,9 +15,9 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap-tokenfield": "^0.12.1",
     "riot": "^2.6.3",
     "d3": "^4.2.7",
-    "fetch": "^1.0.0"
+    "fetch": "^1.0.0",
+    "bootstrap": "^3.3.7"
   }
 }
