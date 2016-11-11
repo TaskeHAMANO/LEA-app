@@ -7,10 +7,13 @@ import UserSampleListStore from "Store/UserSampleListStore"
   <div class="d3-map"></div>
   <style scoped>
     .d3-map{
-      background-color: black;
+      background-color: black ;
     }
     .dot {
-      cursor: pointer;
+      cursor: pointer ;
+    }
+    .topics {
+      cursor: pointer ;
     }
   </style>
 
@@ -23,7 +26,7 @@ import UserSampleListStore from "Store/UserSampleListStore"
         .defer(d3.json, "http://localhost:5000/topic/location")
         .await((error, data, topic_data) =>{
           if (error) throw error
-          data = data.sample_list.slice(0,100) ;
+          data = data.sample_list.slice(0, data.sample_list.length) ;
           topic_data = topic_data.topic_list ;
           data.forEach((d) => {
             d.x = +d.x;
@@ -94,6 +97,10 @@ import UserSampleListStore from "Store/UserSampleListStore"
               .attr("width", topic_width)
               .attr("height", topic_height)
               .attr("transform", transform_topic)
+              .on("click", (d) => {
+                self.setTabStore("info")
+                self.setStore({"topic_id": d.topic_id})
+              })
 
           let samples = svg.append("g")
               .classed("samples", true)

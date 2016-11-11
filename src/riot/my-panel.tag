@@ -14,8 +14,8 @@ import TabAction  from "Action/TabStoreAction"
   <div class="content" if="{activeTab==="info"}">
     <my-info></my-info>
   </div>
-  <div class="content" if="{activeTab==="download"}">
-    <my-download></my-download>
+  <div class="content" if="{activeTab==="data"}">
+    <my-data></my-data>
   </div>
 
   <style scoped>
@@ -53,8 +53,8 @@ import TabAction  from "Action/TabStoreAction"
         label:"Information"
       },
       {
-        type:"download",
-        label:"Download"
+        type:"data",
+        label:"Data"
       }
     ]
 

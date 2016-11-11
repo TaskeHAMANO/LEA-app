@@ -7,13 +7,16 @@ import SampleListAction from "Action/SampleListStoreAction"
       <div class="well">
         <form onsubmit='{submit}'>
           <div class="form-group">
-            <h5>Search samples by text input</h3>
+            <label><h5>Search samples by text input</h5></label>
             <input type="text" name="searched_text" class="form-control">
           </div>
           <button type="reset" name="reset" class="btn btn-default" onclick='{reset}'>Reset</button>
           <button type="submit" name="submit" class="btn btn-primary">Search</button>
         </form>
+        <h5>{message}</h5>
       </div>
+    </div>
+    <div class="row" if={message}>
     </div>
     <div class="menu row">
       <div class="col-lg-12">
@@ -54,35 +57,37 @@ import SampleListAction from "Action/SampleListStoreAction"
     }
 
     this.reset = function(){
-      this.searched_text.value = "" ;
-      this.eco_topic_list = [] ;
-      this.sem_topic_list = [] ;
+      delete this.searched_text.value ;
+      delete this.eco_topic_list ;
+      delete this.sem_topic_list ;
+      delete this.message ;
       self.resetStore() ;
     }
 
 
     this.submit = function(){
+      self.message = "Loading..."
+      self.update();
       let content_height = d3.select(".content").node().getBoundingClientRect().height
       let well_height = d3.select(".well").node().getBoundingClientRect().height 
       let row_size = parseInt((((content_height - well_height)/42) - 3 )/2)
-      console.log(row_size);
-      if(this.searched_text.value.length !== 0){
-        fetch(`http://localhost:5000/string/${encodeURIComponent(this.searched_text.value)}/samples?n_limit=2000`)
-          .then((response) => response.json())
-          .then((json) => {
-            self.setStore(json.sample_list)
-          })
-        fetch(`http://localhost:5000/string/${encodeURIComponent(this.searched_text.value)}/topics/ecological?n_element_limit=${row_size}`)
-          .then((response) => response.json())
-          .then((json) => {
-            self.eco_topic_list = json.topic_list;
-            self.update();
-          })
-        fetch(`http://localhost:5000/string/${encodeURIComponent(this.searched_text.value)}/topics/semantic?n_element_limit=${row_size}`)
-          .then((response) => response.json())
-          .then((json) => {
-            self.sem_topic_list = json.topic_list;
-            self.update();
+      if(this.searched_text.value){
+        d3.queue()
+          .defer(d3.json, `http://localhost:5000/string/${encodeURIComponent(this.searched_text.value)}/samples?n_limit=2000`)
+          .defer(d3.json, `http://localhost:5000/string/${encodeURIComponent(this.searched_text.value)}/topics/ecological?n_element_limit=${row_size}`)
+          .defer(d3.json, `http://localhost:5000/string/${encodeURIComponent(this.searched_text.value)}/topics/semantic?n_element_limit=${row_size}`)
+          .await((error, sample_list, eco_topics, sem_topic) => {
+            if (error) throw error
+
+            if(sample_list.sample_list.length != 0){
+              self.setStore(sample_list.sample_list) ;
+              self.eco_topic_list = eco_topics.topic_list ;
+              self.sem_topic_list = sem_topic.topic_list ;
+              self.message = "Success."
+            }else{
+              self.message = "No result."
+            }
+            self.update() ;
           })
       }else{
         self.reset();

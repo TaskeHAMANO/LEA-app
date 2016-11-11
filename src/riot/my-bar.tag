@@ -43,12 +43,22 @@
       })
     })
 
+    function get_color_scale(color, element_list){
+      if(typeof color == "undefined"){
+        let z = d3.scaleOrdinal(d3.schemeCategory20b);
+        z.domain(element_list);
+        return z
+      }else{
+        let z = (d) => color[d] ;
+        return z
+      }
+    }
     function visualize_bar_chart(data, element_name, chart_id, color){
       let chart_div = d3.select(`#${chart_id} .d3-chart`);
       let content = d3.select(".content")
       let svg_width = content.node().getBoundingClientRect().width / 2 - 30;
       let svg_height = content.node().getBoundingClientRect().height - d3.select(".row-metadata").node().getBoundingClientRect().height - 52 - 10 ;
-      let bar_width = svg_width * 0.9 ;
+      let bar_width  = svg_width * 0.9 ;
       let bar_height = svg_height * 0.9;
       let margin = {top:10, bottom:0, left:30, right:0}
       let svg = chart_div.append("svg")
@@ -70,11 +80,7 @@
       let y = d3.scaleLinear()
         .rangeRound([bar_height, 0]);
       y.domain([0, 0.99 * d3.max(sample_list.map((key) => d3.sum(data[key].map((obj) => obj.value))))]).nice();
-      let z = d3.scaleOrdinal(d3.schemeCategory10);
-      z.domain(element_list);
-      if(typeof color != "undefined"){
-        let z = function(d){return color[d]} ;
-      }
+      let z = get_color_scale(color, element_list);
       data = sample_list.map((key) =>{
         let obj = {sample_id: key}
         data[key].forEach((e)=>{

@@ -1,21 +1,31 @@
 import UserSampleListStore from "Store/UserSampleListStore"
 import UserSampleListAction from "Action/UserSampleListStoreAction"
 
-<my-download>
-  <h3>Download</h3>
-  <button type="button" name="down_png" onclick="{click_png}" class="btn btn-primary btn-block">Download as PNG</button>
-  <button type="button" name="down_svg" onclick="{click_svg}" class="btn btn-primary btn-block">Download as SVG</button>
-  <h3>Upload</h3>
-  <form onSubmit={submit_single} id="upload_single_form">
-    <h4>Upload cluster file</h4>
-    <input type="file" id="up_single_file">
-    <button type="submit">Submit</button>
-  </form>
-  <form onSubmit={submit_multi} id="upload_multi_form">
-    <h4>Upload compressed cluster file</h4>
-    <input type="file" id="up_multi_file">
-    <button type="submit">Submit</button>
-  </form>
+<my-data>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <h3>Download</h3>
+        <button type="button" name="down_png" onclick="{click_png}" class="btn btn-primary btn-block">Download as PNG</button>
+        <button type="button" name="down_svg" onclick="{click_svg}" class="btn btn-primary btn-block">Download as SVG</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <h3>Upload</h3>
+        <form onSubmit={submit_single} id="upload_single_form">
+          <h4>Upload cluster file</h4>
+          <input type="file" id="up_single_file">
+          <button type="submit">Submit</button>
+        </form>
+        <form onSubmit={submit_multi} id="upload_multi_form">
+          <h4>Upload compressed cluster file</h4>
+          <input type="file" id="up_multi_file">
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <script>
     var self = this ;
@@ -46,9 +56,9 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
       }
 
       self.submit_multi = function(){
-        let input = document.getElementById("up_single_file") ;
+        let input = document.getElementById("up_multi_file") ;
         let data = new FormData() ;
-        data.append("cluster_targz_file", input.files[0])
+        data.append("clusters_targz_file", input.files[0])
         fetch("http://localhost:5000/predict_multiple", {
           method: "post",
           mode: "cors",
@@ -93,4 +103,4 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
       }
     })
   </script>
-</my-download>
+</my-data>
