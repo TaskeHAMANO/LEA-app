@@ -25,10 +25,10 @@ aglio -i api.md --server
 
 #### 処理概要
 
-* 入力された文字列に対応したサンプルを返す
-    * サンプルの上限はn_limitで指定する
-    * サンプルは上限以内に関係性の強い順に返す
-    * 各サンプルはオブジェクトで返され次の値を持つ
+* 入力された文字列に対応したsampleを返す
+    * sampleの上限はn_limitで指定する
+    * sampleは上限以内に関係性の強い順に返す
+    * 各sampleはオブジェクトで返され次の値を持つ
         * value: 関係性の強さ
         * sample_id: サンプルID
 * n_limitのデフォルト値は10とする
@@ -57,10 +57,10 @@ aglio -i api.md --server
 
 #### 処理概要
 
-*  入力された文字列に対応した単語・微生物を環境トピックについて返す
-    * トピックの上限はn_topic_limitで指定する
-    * トピック毎の要素の上限はn_element_limitで指定する
-    * トピック, 要素は上限以内に関係性の強い順に返す
+*  入力された文字列に対応した単語・微生物を環境topicについて返す
+    * topicの上限はn_topic_limitで指定する
+    * topic毎の要素の上限はn_element_limitで指定する
+    * topic, 要素は上限以内に関係性の強い順に返す
 * n_topic_limitのデフォルト値は3とする
 * n_element_limitのデフォルト値は5とする
 * stringは必要。指定がない場合Bad requestを返す
@@ -115,10 +115,10 @@ aglio -i api.md --server
 
 #### 処理概要
 
-*  入力された文字列に対応した単語・微生物を意味的トピックについて返す
-    * トピックの上限はn_topic_limitで指定する
-    * トピック毎の要素の上限はn_element_limitで指定する
-    * トピック, 要素は上限以内に関係性の強い順に返す
+*  入力された文字列に対応した単語・微生物を意味的topicについて返す
+    * topicの上限はn_topic_limitで指定する
+    * topic毎のobjectの上限はn_element_limitで指定する
+    * topic, topic内のobjectは上限以内にvalueの大きい順に返す
 * n_topic_limitのデフォルト値は3とする
 * n_element_limitのデフォルト値は5とする
 * stringは必要。指定がない場合Bad requestを返す
@@ -173,7 +173,7 @@ aglio -i api.md --server
 
 #### 処理概要
 
-* サンプルの位置を返す
+* sampleの位置を返す
 
 + Response 200 (application/json)
 
@@ -241,7 +241,7 @@ aglio -i api.md --server
 
 #### 処理概要
 
-* 入力されたサンプルのメタデータを返す
+* 入力されたsample_idのメタデータを返す
 * sample_idは必要。無かった場合はBadRequestを返す。
 * 入力されたsample_idが存在しなかった場合Not Foundを返す
 
@@ -253,7 +253,107 @@ aglio -i api.md --server
     + Attributes
         + metadata(required)
             + sample_name: hot spring sample(string, required)
-            + sample_url: http://example.com/SRS123456 (string, required)
+
+## クラスターファイルからユーザーサンプルを登録 [/new_sample]
+
+### クラスターファイルアップロードAPI [POST]
+
+#### 処理概要
+
+* ファイルをアップロードして、そのファイルに対応した座標と名前を返す
+* 送信できるファイルはcluster拡張子のテキストファイルか、それが圧縮されたtar.gzファイルのどちらか
+
++ Request (multipart/form-data; boundary=BOUNDARY)
+
+    + Headers
+    
+            Accept-Type: application-json
+
+    + Body
+
+            #cluster_fileの際には次
+            --BOUNDARY
+            
+            Content-Disposition: form-data; name="cluster_file"
+            Content-Type: application/octet-stream
+            
+            $FILE_DATA
+            BOUNDARY--
+            
+            #clusters_targz_fileの際には次
+            --BOUNDARY
+            
+            Content-Disposition: form-data; name="clusters_targz_file"
+            Content-Type: application/x-tar
+            
+            $FILE_DATA
+            BOUNDARY--
+
++ Response 201 (application/json)
+    
+    + Attributes
+        + sample_list(array, required)
+            + (object)
+                + x : 23.4 (number, required)
+                + y : 235.2 (number, required)
+                + sample_id : 20161112181319fb26722033ff0e5d7f78a5ef55a5d58a (string, required)
+                + project_id : 20161112181319fb26722033ff0e5d7f78a5ef55a5d58a (string, required)
+
+
+## ユーザーサンプルIDから系統組成取得 [/new_sample/{project_id}/{sample_id}/taxonomies/{taxon_rank}]
+
+### ユーザーサンプル系統組成取得API [GET]
+
+#### 処理概要
+
+* POSTされたクラスターファイルから偉えるsample_idの系統組成を返す
+* sample_id, project_id, taxon_rankは必要。無かった場合はBadRequestを返す
+* 入力されたproject_id, sample_idが存在しなかった場合Not Foundを返す
+* 入力されたtaxon_rankが存在しなかった場合BadRequestを返す
+
++ Parameters
+    + project_id: 20161112181319fb26722033ff0e5d7f78a5ef55a5d58a (string, required)
+    + sample_id: 20161112181319fb26722033ff0e5d7f78a5ef55a5d58a (string, required)
+    + taxon_rank: genus (string, required)
+
+
++ Response 200 (application/json)
+    
+    + Attributes
+        + taxonomy_list(array, required)
+            + (object)
+                + taxonomy_name: firmicutes (string, required)
+                + value: 0.34 (number, required)
+            + (object)
+                + taxonomy_name: proteobacteria (string, required)
+                + value: 0.22 (number, required)
+
+## ユーザーサンプルIDからトピック組成取得 [/new_sample/{project_id}/{sample_id}/topics]
+
+### ユーザーサンプルトピック組成取得API [GET]
+
+#### 処理概要
+
+* POSTされたクラスターファイルから偉えるsample_idのトピック組成を返す
+* sample_id, project_id。無かった場合はBadRequestを返す
+* 入力されたproject_id, sample_idが存在しなかった場合Not Foundを返す
+
+
++ Parameters
+    + project_id: 20161112181319fb26722033ff0e5d7f78a5ef55a5d58a (string, required)
+    + sample_id: 20161112181319fb26722033ff0e5d7f78a5ef55a5d58a (string, required)
+
++ Response 200 (application/json)
+
+    + Attributes
+        + taxonomy_list(array, required)
+            + (object)
+                + topic_id: 4 (number, required)
+                + value: 0.34 (number, required)
+            + (object)
+                + topic_id: 42 (number, required)
+                + value: 0.29 (number, required)
+
 
 ## トピックの位置を返す [/topic/location]
 
@@ -261,7 +361,7 @@ aglio -i api.md --server
 
 #### 処理概要
 
-* トピックの位置を返す
+* topicの位置を返す
 
 + Response 200 (application/json)
 
@@ -272,18 +372,22 @@ aglio -i api.md --server
                 + y : 235.2 (number, required)
                 + topic_id : 5 (number, required)
 
-## トピックIDから単語組成取得 [/topic/words/{topic_id}]
+## トピックIDから単語組成取得 [/topic/{topic_id}/words{?n_word_limit}]
 
 ### トピック単語組成取得API [GET]
 
 #### 処理概要
 
-* 入力されたトピックIDの単語組成を返す
-* トピックidは必要。無かった場合BadRequestを返す。
-+ 入力されたトピックIDが無かった場合はNot Foundを返す。
+* 入力されたtopic_idの単語組成を返す
+* topic_idは必要。無かった場合BadRequestを返す。
+* 入力されたtopic_idが無かった場合はNot Foundを返す。
+* 単語はvalueの大きい順に返す
+* 単語の上限数はn_word_limitで指定する。デフォルト値は5とする。
+
 
 + Parameters
     + topic_id: 4(number, required)
+    + n_word_limit: 10(number)
     
 + Response 200 (application/json)
     
@@ -296,18 +400,20 @@ aglio -i api.md --server
                 + word: foot(string, required)
                 + value: 0.21 (number, required)
 
-## トピックIDから系統組成取得 [/topic/taxonomies/{topic_id}]
+## トピックIDから系統組成取得 [/topic/{topic_id}/taxonomies/{taxon_rank}]
 
 ### トピック系統組成取得API [GET]
 
 #### 処理概要
 
-* 入力されたトピックIDの系統組成を返す
-* トピックidは必要。無かった場合BadRequestを返す。
-+ 入力されたトピックIDが無かった場合はNot Foundを返す。
+* 入力されたtopic_idの系統組成を返す
+* topic_id, taxon_rankは必要。無かった場合BadRequestを返す。
+* 入力されたtopic_idが無かった場合はNot Foundを返す。
+* 入力されたtaxon_rankが存在しなかった場合はBadRequestを返す
 
 + Parameters
     + topic_id: 4(number, required)
+    + taxon_rank: genus(string, required)
     
 + Response 200 (application/json)
     
@@ -319,3 +425,25 @@ aglio -i api.md --server
             + (object)
                 + taxonomy_name: proteobacteria(string, required)
                 + value: 0.25 (number, required)
+                
+## トピックIDからメタデータ取得 [/topic/{topic_id}/metadata]
+
+### トピックメタデータ取得API [GET]
+
+#### 処理概要
+
+* 入力されたtopic_idのメタデータを返す
+* topic_idは必要。無かった場合BadRequestを返す。
+* 入力されたtopic_idが無かった場合はNot Foundを返す。
+
+
++ Parameters
+    + topic_id: 4(number, required)
+    
++ Response 200 (application/json)
+    
+    + Attributes
+        + metadata(required)
+            + attribution(string, required)
+            + source_url(string, required)
+            + lisence(string, required)
