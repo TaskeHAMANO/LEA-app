@@ -46,6 +46,9 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
         fetch("http://localhost:5000/predict_single", {
           method: "post",
           mode: "cors",
+          headers: {
+            "Accept": "application/json",
+          },
           body: data
         })
         .then((response) => response.json())
@@ -62,6 +65,9 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
         fetch("http://localhost:5000/predict_multiple", {
           method: "post",
           mode: "cors",
+          headers: {
+            "Accept": "application/json",
+          },
           body: data
         })
         .then((response) => response.json())
