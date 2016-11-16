@@ -16,7 +16,7 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
         <form onSubmit={submit_file} id="upload_form">
           <h4>Upload cluster file</h4>
           <h5>.cluster file or tar.gz compressed cluster file</h5>
-          <input type="file" id="upload_file" accept="application/x-gzip,application/octet-stream">
+          <input type="file" id="upload_file">
           <button type="submit">Submit</button>
         </form>
         <h5>{message}</h5>
