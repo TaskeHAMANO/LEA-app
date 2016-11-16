@@ -7,7 +7,7 @@ import SampleListAction from "Action/SampleListStoreAction"
       <div class="well">
         <form onsubmit='{submit}'>
           <div class="form-group">
-            <label><h5>Search samples by text input</h5></label>
+            <label><h3>Search</h3></label>
             <input type="text" name="searched_text" class="form-control">
           </div>
           <button type="reset" name="reset" class="btn btn-default" onclick='{reset}'>Reset</button>
@@ -19,7 +19,7 @@ import SampleListAction from "Action/SampleListStoreAction"
     <div class="row" if={message}>
     </div>
     <div class="menu row">
-      <div class="col-lg-12">
+      <div class="col-xs-12">
         <div each={sem_topic, i in sem_topic_list} class="menu-category list-group">
           <div class="menu-category-name list-group-item active"><h6> Semantic meaning of current status </h4></div>
           <a each={word_value, j in sem_topic.word} href="javascript:void(0)" class="menu-item list-group-item" onclick='{click_word}'>{word_value.word}<span class="badge">{word_value.value}</span></a>
@@ -27,7 +27,7 @@ import SampleListAction from "Action/SampleListStoreAction"
       </div>
     </div>
     <div class="menu row">
-      <div class="col-lg-12">
+      <div class="col-xs-12">
         <div each={eco_topic, i in eco_topic_list} class="menu-category list-group">
           <div class="menu-category-name list-group-item active"><h6> Ecologically co-occurrence word </h4></div>
           <a each={word_value, j in eco_topic.word} href="javascript:void(0)" class="menu-item list-group-item" onclick='{click_word}'>{word_value.word}<span class="badge">{word_value.value}</span></a>
@@ -57,7 +57,7 @@ import SampleListAction from "Action/SampleListStoreAction"
     }
 
     this.reset = function(){
-      delete this.searched_text.value ;
+      this.searched_text.value = "" ;
       delete this.eco_topic_list ;
       delete this.sem_topic_list ;
       delete this.message ;

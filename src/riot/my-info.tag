@@ -7,38 +7,42 @@ import SelectInfoStore      from "Store/SelectInfoStore"
     </div>
     <div if={has_sample_id()} class="row-metadata">
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col-xs-12">
           <h3>Sample metadata</h3>
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col-xs-4 col-lg-12">
           <h4> Sample ID: </h4> {metadata.sample_id}
+        </div>
+        <div class="col-xs-4 col-lg-12">
           <div if={ metadata.sample_name }>
             <h4> Sample Name: </h4> {metadata.sample_name}
           </div>
+        </div>
+        <div class="col-xs-4 col-lg-12">
           <div if={ metadata.project_id }>
             <h4> Project ID: </h4> {metadata.project_id}
           </div>
         </div>
       </div>
       <div class="row" if={ metadata.sample_mdb_url && metadata.sample_ncbi_url }>
-        <div class="col-lg-6">
+        <div class="col-xs-6">
           <h4> MicrobeDB.jp: </h4> <a href={metadata.sample_mdb_url}>Link</a>
         </div>
-        <div class="col-lg-6">
+        <div class="col-xs-6">
           <h4> NCBI: </h4> <a href={metadata.sample_ncbi_url}>Link</a>
         </div>
       </div>
     </div>
     <div if={has_topic_id()} class="row-metadata">
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col-xs-12">
           <h3>Topic metadata</h3>
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col-xs-12">
           <h4> Topic ID: </h4> {metadata.topic_id}
           <h6> License: </h6> {metadata.license}
           <h6> Attribution: </h6> {metadata.attribution}
@@ -47,13 +51,13 @@ import SelectInfoStore      from "Store/SelectInfoStore"
       </div>
     </div>
     <div class="row row-chart">
-      <div class="col-lg-6">
+      <div class="col-xs-6">
         <div id="taxon_chart" if={taxon_list}>
           <h3>Taxon</h3>
           <my-bar data={taxon_list} element_name={taxon_element_name} chart_id="taxon_bar_chart" color={taxon_color}></my-bar>
         </div>
       </div>
-      <div class="col-lg-6">
+      <div class="col-xs-6">
         <div id="topic_chart" if={topic_list}>
           <h3>Topic</h3>
           <my-bar data={topic_list} element_name={topic_element_name} chart_id="topic_bar_chart" color={topic_color}></my-bar>
@@ -148,8 +152,8 @@ import SelectInfoStore      from "Store/SelectInfoStore"
           delete self.topic_list ;
           d3.queue()
             .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/metadata`)
-            .defer(d3.json, `http://localhost:5000/topic/taxonomies/${self.metadata.topic_id}`)
-            .defer(d3.json, `http://localhost:5000/topic/words/${self.metadata.topic_id}`)
+            .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/taxonomies/genus`)
+            .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/words?n_word_limit=1`)
             .await((error, metadata, taxon, words) => {
               if (error) throw error
 

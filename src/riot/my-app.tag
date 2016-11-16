@@ -1,10 +1,10 @@
 <my-app>
   <div class="container-fluid container-extend">
     <div class="row row-0">
-      <div class="col-lg-3 column-extend">
+      <div class="col-lg-3 col-xs-12 column-extend">
         <my-panel/>
       </div>
-      <div class="col-lg-9 column-extend">
+      <div class="col-lg-9 col-xs-12 column-extend">
         <my-map/>
       </div>
     </div>
