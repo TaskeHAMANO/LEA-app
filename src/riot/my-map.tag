@@ -4,10 +4,19 @@ import SampleListStore  from "Store/SampleListStore"
 import UserSampleListStore from "Store/UserSampleListStore"
 
 <my-map>
-  <div class="d3-map"></div>
+  <div class="d3-map">
+    <svg id="map_svg" xmlnx="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1">
+      <g>
+        <rect fill="black"></rect>
+      </g>
+    </svg>
+  </div>
+
   <style scoped>
     .d3-map{
       background-color: black ;
+      min-width: 100% ;
+      min-height: 100% ;
     }
     .dot {
       cursor: pointer ;
@@ -29,62 +38,51 @@ import UserSampleListStore from "Store/UserSampleListStore"
         .defer(d3.json, "http://localhost:5000/topic/location")
         .await((error, data, topic_data) =>{
           if (error) throw error
+
+          // data processing
+          let current_url = window.location.href ;
+          let current_domain = current_url.replace(/index.html/g, "/data") ;
           data = data.sample_list ;
           topic_data = topic_data.topic_list ;
           data.forEach((d) => {
-            d.x = +d.x;
-            d.y = +d.y;
+            d.x = +d.x ;
+            d.y = +d.y ;
           });
           topic_data.forEach((d) => {
-              d.x = +d.x;
-              d.y = +d.y;
+              d.x = +d.x ;
+              d.y = +d.y ;
+              d.href = `${current_domain}/${d.topic_id}.png` ;
           });
 
+          let chart_div = d3.select(".d3-map") ;
+          let svg_width = chart_div.node().getBoundingClientRect().width ;
+          let svg_height = chart_div.node().getBoundingClientRect().height ;
           let zoomBehavior = d3.zoom()
               .on("zoom", zoom)
               .scaleExtent([1, 10]) ;
-
-          let chart_div = d3.select(".d3-map")
-              .style("min-width", "100%")
-              .style("min-height", "100%") ;
-          let svg_width = chart_div.node().getBoundingClientRect().width ;
-          let svg_height = chart_div.node().getBoundingClientRect().height ;
-          let svg = chart_div.append("svg")
+          let svg = chart_div.select("svg")
               .attr("width", svg_width)
               .attr("height", svg_height)
-              .attr("id", "map_svg")
-              .attr("xmlns", "http://www.w3.org/2000/svg")
-              .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
-              .attr("version", "1.1")
               .call(zoomBehavior)
               .call(drag)
-            .append("g") ;
-
-          svg.append("rect")
+          svg.select("rect")
             .attr("width", "100%")
-            .attr("height", "100%")
-            .attr("fill", "black") ;
+            .attr("height", "100%") ;
 
-          let margin = { top: 0, right: 0, bottom: 0, left: 0},
-            topic_width = 60,
-            topic_height = 60 ;
-
+          // assign scale
           self.x = d3.scaleLinear()
             .range([0, svg_width]).nice() ;
           self.y = d3.scaleLinear()
             .range([svg_height, 0]).nice() ;
-
           let xMax = d3.max(data, (d) => d.x ) * 1.10,
               xMin = d3.min(data, (d) => d.x ) * 1.10,
               yMax = d3.max(data, (d) => d.y ) * 1.10,
               yMin = d3.min(data, (d) => d.y ) * 1.10 ;
-
           self.x.domain([xMin, xMax]) ;
           self.y.domain([yMin, yMax]) ;
 
-          let current_url = window.location.href ;
-          let current_domain = current_url.replace(/index.html/g, "/data") ;
-
+          let topic_width = 60,
+              topic_height = 60 ;
           let topics = svg.append("g")
               .classed("topics", true)
               .attr("width", "100%")
@@ -94,7 +92,7 @@ import UserSampleListStore from "Store/UserSampleListStore"
               .data(topic_data)
             .enter().append("image")
               .classed("topicimage", true)
-              .attr("xlink:href", (d) => `${current_domain}/${d.topic_id}.png`)
+              .attr("xlink:href", (d) => d.href)
               .attr("width", topic_width)
               .attr("height", topic_height)
               .attr("transform", transform_topic)
