@@ -84,18 +84,27 @@ import SelectInfoStore      from "Store/SelectInfoStore"
       .then((response) => response.json())
       .then((json) => {
         let color = json.topic_list.reduce((object, d, index) => {
-          object[d.topic_id] = d.color
+          object[d.topic_id] = d.color ;
           return object
         }, {})
         self.topic_color = color ;
-      })
-    self.taxon_color = undefined ;
+      }) ;
 
-    self.has_project_id = () => self.metadata.hasOwnProperty("project_id")
+    fetch("http://localhost:5000/taxonomy/color")
+      .then((response) => response.json())
+      .then((json) => {
+        let color = json.taxonomy_list.reduce((object, d, index) => {
+          object[d.taxonomy_name] = d.color ;
+          return object
+        }, {})
+        self.taxon_color = color ;
+      }) ;
 
-    self.has_sample_id  = () => self.metadata.hasOwnProperty("sample_id")
+    self.has_project_id = () => self.metadata.hasOwnProperty("project_id") ;
 
-    self.has_topic_id   = () => self.metadata.hasOwnProperty("topic_id")
+    self.has_sample_id  = () => self.metadata.hasOwnProperty("sample_id") ;
+
+    self.has_topic_id   = () => self.metadata.hasOwnProperty("topic_id") ;
 
     self.bar_chart_size = () => {
       let content_height = d3.select(".content").node().getBoundingClientRect().height ;
@@ -107,7 +116,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
       let bar_width = content_width / 2 ;
 
       return [bar_width, bar_height];
-    }
+    } ;
 
     self.on("mount", ()=>{
       self.topic_element_name = "topic_id" ;
