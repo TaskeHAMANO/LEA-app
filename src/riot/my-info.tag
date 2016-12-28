@@ -54,13 +54,13 @@ import SelectInfoStore      from "Store/SelectInfoStore"
       <div class="col-xs-6">
         <div id="taxon_chart" if={taxon_list}>
           <h3>Taxon</h3>
-          <my-bar data={taxon_list} element_name={taxon_element_name} chart_id="taxon_bar_chart" color={taxon_color}></my-bar>
+          <my-bar data={taxon_list} element_name={taxon_element_name} chart_id="taxon_bar_chart" color={taxon_color} width={bar_width} height={bar_height}></my-bar>
         </div>
       </div>
       <div class="col-xs-6">
         <div id="topic_chart" if={topic_list}>
           <h3>Topic</h3>
-          <my-bar data={topic_list} element_name={topic_element_name} chart_id="topic_bar_chart" color={topic_color}></my-bar>
+          <my-bar data={topic_list} element_name={topic_element_name} chart_id="topic_bar_chart" color={topic_color} width={bar_width} height={bar_height}></my-bar>
         </div>
         <div id="word_chart" if={word_list}>
           <h3>Word</h3>
@@ -97,6 +97,18 @@ import SelectInfoStore      from "Store/SelectInfoStore"
 
     self.has_topic_id   = () => self.metadata.hasOwnProperty("topic_id")
 
+    self.bar_chart_size = () => {
+      let content_height = d3.select(".content").node().getBoundingClientRect().height ;
+      let metadata_height = d3.select(".row-metadata").node().getBoundingClientRect().height ;
+      let title_height = 26 ;
+      let bar_height = content_height - metadata_height - title_height ;
+
+      let content_width = d3.select(".content").node().getBoundingClientRect().width; 
+      let bar_width = content_width / 2 ;
+
+      return [bar_width, bar_height];
+    }
+
     self.on("mount", ()=>{
       self.topic_element_name = "topic_id" ;
       self.taxon_element_name = "taxonomy_name" ;
@@ -110,8 +122,17 @@ import SelectInfoStore      from "Store/SelectInfoStore"
             d3.queue()
               .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/taxonomies/genus`)
               .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/topics`)
-              .await((error, taxon, topics) => {
+              .awaitAll((error, result) => {
                 if (error) throw error
+
+                let taxon = result[0]
+                let topics = result[1]
+
+                self.update()
+
+                let bar_size = self.bar_chart_size() ;
+                self.bar_width = bar_size[0] ;
+                self.bar_height = bar_size[1] ;
 
                 let taxon_list = {}
                 taxon_list[self.metadata.sample_id] = taxon.taxonomy_list ;
@@ -121,7 +142,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
                 topic_list[self.metadata.sample_id] = topics.topic_list ;
                 self.topic_list = topic_list ;
 
-                self.update()
+                self.update();
               })
             ;
           }else{
@@ -129,12 +150,21 @@ import SelectInfoStore      from "Store/SelectInfoStore"
               .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/metadata`)
               .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/taxonomies/genus`)
               .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/topics`)
-              .await((error, metadata, taxon, topics) => {
+              .awaitAll((error, result) => {
                 if (error) throw error
+
+                let metadata = result[0]
+                let taxon = result[1]
+                let topics = result[2]
 
                 self.metadata["sample_name"] = metadata.metadata.SampleName;
                 self.metadata["sample_ncbi_url"] = `http://ncbi.nlm.nih.gov/sra/${self.metadata.sample_id}`;
                 self.metadata["sample_mdb_url"] = `http://biointegra.jp/MDBdemo/search/?q1=${self.metadata.sample_id}&q1_cat=sample&q1_param_srs_id=${self.metadata.sample_id}` ;
+                self.update()
+
+                let bar_size = self.bar_chart_size();
+                self.bar_width = bar_size[0] ; 
+                self.bar_height = bar_size[1] ;
 
                 let taxon_list = {}
                 taxon_list[self.metadata.sample_id] = taxon.taxonomy_list ;
@@ -153,19 +183,31 @@ import SelectInfoStore      from "Store/SelectInfoStore"
           d3.queue()
             .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/metadata`)
             .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/taxonomies/genus`)
-            .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/words?n_word_limit=1`)
-            .await((error, metadata, taxon, words) => {
+            .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/words?n_word_limit=15`)
+            .awaitAll((error, result) => {
               if (error) throw error
+
+              let metadata = result[0]
+              let taxon = result[1]
+              let words = result[2]
 
               self.metadata["attribution"] = metadata.metadata.Attribution ;
               self.metadata["image_url"] = metadata.metadata.ImageURL ;
               self.metadata["license"] = metadata.metadata.License ;
 
+              self.update()
+
+              let bar_size = self.bar_chart_size();
+              self.bar_width = bar_size[0] ; 
+              self.bar_height = bar_size[1] ;
+              let elem_height = 42 ;
+              let word_num = parseInt(self.bar_height) / elem_height - 1 ;
+
               let taxon_list = {}
               taxon_list[''+self.metadata.topic_id] = taxon.taxonomy_list ;
               self.taxon_list = taxon_list ;
 
-              self.word_list = words.word_list.slice(0,5) ;
+              self.word_list = words.word_list.slice(0,word_num) ;
 
               self.update();
             })

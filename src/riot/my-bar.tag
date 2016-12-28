@@ -1,12 +1,25 @@
 <my-bar>
   <div id={opts.chart_id}>
-    <div class="d3-chart"></div>
+    <div class="d3-chart svg-container"></div>
     <div class="d3-tooltip"></div>
   </div>
 
   <style scoped>
     div.d3-chart {
       z-index:0 ;
+    }
+    div.svg-container {
+      display: inline-block;
+      position: relative ;
+      width: 100% ;
+      padding-bottom: 100% ;
+      vertical-align: top;
+    }
+    .svg-content-responsive {
+      display: inline-block;
+      position: absolute;
+      top: 10px;
+      left: 0;
     }
     div.d3-tooltip {
       z-index:1 ;
@@ -31,15 +44,20 @@
       let element_name = opts.element_name ;
       let chart_id = opts.chart_id ;
       let color = opts.color ;
-      visualize_bar_chart(data, element_name, chart_id, color);
+      let width = opts.width ;
+      let height = opts.height ;
+      visualize_bar_chart(data, element_name, chart_id, color, width, height);
 
       self.on("updated", () => {
         let data = opts.data ;
+        if(typeof data == "undefined") return false
         let element_name = opts.element_name ;
         let chart_id = opts.chart_id
         let color = opts.color ;
+        let width = opts.width ;
+        let height = opts.height ;
         d3.select(`#${chart_id} .d3-chart svg`).remove()
-        visualize_bar_chart(data, element_name, chart_id, color);
+        visualize_bar_chart(data, element_name, chart_id, color, width, height);
       })
     })
 
@@ -53,19 +71,20 @@
         return z
       }
     }
-    function visualize_bar_chart(data, element_name, chart_id, color){
+    function visualize_bar_chart(data, element_name, chart_id, color, width, height){
       let chart_div = d3.select(`#${chart_id} .d3-chart`);
-      let content = d3.select(".content")
-      let svg_width = content.node().getBoundingClientRect().width / 2 - 30;
-      let svg_height = content.node().getBoundingClientRect().height - d3.select(".row-metadata").node().getBoundingClientRect().height - 52 - 10 ;
+      let svg_width = width ;
+      let svg_height = height ;
       let bar_width  = svg_width * 0.9 ;
       let bar_height = svg_height * 0.9;
       let margin = {top:10, bottom:0, left:30, right:0}
       let svg = chart_div.append("svg")
-          .attr("width", svg_width)
-          .attr("height", svg_height)
+          .attr("preserveAspectRatio", "xMinYMax")
+          .attr("viewBox", `0 0 ${width} ${height}`)
+          .classed("svg-content-responsive", true)
         .append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top +")");
+          .attr("transform", "translate(" + margin.left + "," + margin.top +")")
+      ;
       let sample_list = []
       for (let key in data){
         sample_list.push(key)
@@ -75,24 +94,28 @@
       let x = d3.scaleBand()
         .rangeRound([0, bar_width])
         .padding(0.1)
-        .align(0.1);
-      x.domain(sample_list);
+        .align(0.1)
+      ;
+      x.domain(sample_list) ;
       let y = d3.scaleLinear()
-        .rangeRound([bar_height, 0]);
-      y.domain([0, 0.99 * d3.max(sample_list.map((key) => d3.sum(data[key].map((obj) => obj.value))))]).nice();
-      let z = get_color_scale(color, element_list);
+        .rangeRound([bar_height, 0]) 
+      ;
+      y.domain([0, 0.99 * d3.max(sample_list.map((key) => d3.sum(data[key].map((obj) => obj.value))))]).nice() ;
+      let z = get_color_scale(color, element_list) ;
       data = sample_list.map((key) =>{
-        let obj = {sample_id: key}
+        let obj = {sample_id: key} ;
         data[key].forEach((e)=>{
           obj[e[element_name]] = e["value"];
         })
-        return obj;
+        return obj
       })
       let stack = d3.stack()
-        .keys(element_list) ;
+        .keys(element_list) 
+      ;
 
       let tip = d3.select(`#${chart_id} .d3-tooltip`)
-        .style("visibility", "hidden");
+        .style("visibility", "hidden")
+      ;
 
       svg.selectAll(".serie")
         .data(stack(data))
@@ -117,12 +140,15 @@
           .attr("y", (d) => y(d[1]))
           .attr("height", (d) => (y(d[0]) - y(d[1])))
           .attr("width", x.bandwidth())
-          ;
+          .attr("stroke", "black")
+          .attr("stroke-width", 1)
+      ;
 
       svg.append("g")
         .attr("class", "axis axis--x")
         .attr("transform", "translate(0, " + bar_height + ")")
-        .call(d3.axisBottom(x)) ;
+        .call(d3.axisBottom(x)) 
+      ;
 
       svg.append("g")
         .attr("class", "axis axis--y")
@@ -133,7 +159,8 @@
         .attr("dy", "0.35em")
         .attr("text-anchor", "start")
         .attr("fill", "#000")
-        .text("Abundance") ;
+        .text("Abundance") 
+      ;
     }
   </script>
 </my-bar>
