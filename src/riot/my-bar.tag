@@ -1,6 +1,8 @@
 <my-bar>
   <div id={opts.chart_id}>
-    <div class="d3-chart svg-container"></div>
+    <div class="d3-chart svg-container">
+      <svg class="svg-content-responsive" preserveAspectRatio="xMinYMax" viewBox="0 0 {opts.width} {opts.height}"></svg>
+    </div>
     <div class="d3-tooltip"></div>
   </div>
 
@@ -56,10 +58,12 @@
         let color = opts.color ;
         let width = opts.width ;
         let height = opts.height ;
-        d3.select(`#${chart_id} .d3-chart svg`).remove()
+        d3.select(`#${chart_id} svg g`).remove()
         visualize_bar_chart(data, element_name, chart_id, color, width, height);
       })
     })
+
+    self.margin = {top:10, bottom:0, left:30, right:0}
 
     function get_color_scale(color, element_list){
       if(typeof color == "undefined"){
@@ -71,51 +75,43 @@
         return z
       }
     }
+
     function visualize_bar_chart(data, element_name, chart_id, color, width, height){
-      let chart_div = d3.select(`#${chart_id} .d3-chart`);
       let svg_width = width ;
       let svg_height = height ;
       let bar_width  = svg_width * 0.9 ;
-      let bar_height = svg_height * 0.9;
-      let margin = {top:10, bottom:0, left:30, right:0}
-      let svg = chart_div.append("svg")
-          .attr("preserveAspectRatio", "xMinYMax")
-          .attr("viewBox", `0 0 ${width} ${height}`)
-          .classed("svg-content-responsive", true)
-        .append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top +")")
-      ;
-      let sample_list = []
+      let bar_height = svg_height * 0.9 ;
+      let sample_list = [] ;
       for (let key in data){
         sample_list.push(key)
       }
-      let element_list = data[sample_list[0]].map((e) => e[element_name])
+      let element_list = data[sample_list[0]].map((e) => e[element_name]) ;
 
       let x = d3.scaleBand()
         .rangeRound([0, bar_width])
         .padding(0.1)
-        .align(0.1)
-      ;
+        .align(0.1) ;
       x.domain(sample_list) ;
       let y = d3.scaleLinear()
-        .rangeRound([bar_height, 0]) 
-      ;
+        .rangeRound([bar_height, 0]) ;
       y.domain([0, 0.99 * d3.max(sample_list.map((key) => d3.sum(data[key].map((obj) => obj.value))))]).nice() ;
       let z = get_color_scale(color, element_list) ;
+
       data = sample_list.map((key) =>{
         let obj = {sample_id: key} ;
         data[key].forEach((e)=>{
           obj[e[element_name]] = e["value"];
         })
         return obj
-      })
+      }) ;
       let stack = d3.stack()
-        .keys(element_list) 
-      ;
+        .keys(element_list) ;
 
+      let svg = d3.select(`#${chart_id} .d3-chart svg`)
+        .append("g")
+          .attr("transform", `translate(${self.margin.left}, ${self.margin.top})`) ;
       let tip = d3.select(`#${chart_id} .d3-tooltip`)
-        .style("visibility", "hidden")
-      ;
+        .style("visibility", "hidden") ;
 
       svg.selectAll(".serie")
         .data(stack(data))
@@ -125,8 +121,8 @@
           .attr("fill", (d) => z(d.key))
           .on("mouseover", (d) =>{
             tip.style("visibility", "visible")
-              .style("left", (d3.event.layerX)+"px")
-              .style("top", (d3.event.layerY)+"px")
+              .style("left", `${d3.event.layerX}px`)
+              .style("top", `${d3.event.layerY}px`)
               .html(() => `<p>${element_name}: ${d.key}</p>`) ;
           })
           .on("mouseout", (d) =>{
@@ -141,14 +137,12 @@
           .attr("height", (d) => (y(d[0]) - y(d[1])))
           .attr("width", x.bandwidth())
           .attr("stroke", "black")
-          .attr("stroke-width", 1)
-      ;
+          .attr("stroke-width", 1) ;
 
       svg.append("g")
         .attr("class", "axis axis--x")
-        .attr("transform", "translate(0, " + bar_height + ")")
-        .call(d3.axisBottom(x)) 
-      ;
+        .attr("transform", `translate(0,${bar_height})`)
+        .call(d3.axisBottom(x)) ;
 
       svg.append("g")
         .attr("class", "axis axis--y")
@@ -159,8 +153,7 @@
         .attr("dy", "0.35em")
         .attr("text-anchor", "start")
         .attr("fill", "#000")
-        .text("Abundance") 
-      ;
+        .text("Abundance") ;
     }
   </script>
 </my-bar>

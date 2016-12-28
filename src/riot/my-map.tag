@@ -61,10 +61,11 @@ import UserSampleListStore from "Store/UserSampleListStore"
               .on("zoom", zoom)
               .scaleExtent([1, 10]) ;
           let svg = chart_div.select("svg")
-              .attr("width", svg_width)
-              .attr("height", svg_height)
-              .call(zoomBehavior)
-              .call(drag)
+                .attr("width", svg_width)
+                .attr("height", svg_height)
+                .call(zoomBehavior)
+                .call(drag)
+              .select("g") ;
           svg.select("rect")
             .attr("width", "100%")
             .attr("height", "100%") ;
@@ -83,12 +84,10 @@ import UserSampleListStore from "Store/UserSampleListStore"
 
           let topic_width = 60,
               topic_height = 60 ;
-          let topics = svg.append("g")
-              .classed("topics", true)
-              .attr("width", "100%")
-              .attr("height", "100%") ;
 
-          topics.selectAll(".topicimage")
+          svg.append("g")
+              .classed("topics", true)
+            .selectAll(".topicimage")
               .data(topic_data)
             .enter().append("image")
               .classed("topicimage", true)
@@ -101,12 +100,9 @@ import UserSampleListStore from "Store/UserSampleListStore"
                 self.setStore({"topic_id": d.topic_id})
               }) ;
 
-          let samples = svg.append("g")
+          svg.append("g")
               .classed("samples", true)
-              .attr("width", "100%")
-              .attr("height", "100%") ;
-
-          samples.selectAll(".dot")
+            .selectAll(".dot")
               .data(data)
             .enter().append("circle")
               .classed("dot", true)
@@ -144,7 +140,7 @@ import UserSampleListStore from "Store/UserSampleListStore"
       }) ;
     }
 
-    this.on("mount", ()=>{
+    self.on("mount", ()=>{
       const selectInfoAction = new SelectInfoAction() ;
       const tabAction = new TabAction() ;
 
@@ -158,6 +154,7 @@ import UserSampleListStore from "Store/UserSampleListStore"
       } ;
       selectInfoAction.resetStore() ;
 
+      // Procedure for uploaded samples
       UserSampleListStore.on(UserSampleListStore.ActionTypes.changed, ()=>{
         let user_sample_list = UserSampleListStore.user_sample_list ;
         let svg = d3.select(".d3-map svg g") ;
@@ -173,7 +170,7 @@ import UserSampleListStore from "Store/UserSampleListStore"
             .classed("cross", true)
             .classed("user", true)
             .attr("d", d3.symbol().size(30).type(d3.symbolCross))
-            .attr("transform", (d) => "translate(" + self.x(d.x) + "," + self.y(d.y) +")")
+            .attr("transform", (d) => `translate(${self.x(d.x)},${self.y(d.y)})`)
             .style("fill", "white")
             .on("click", (d) => {
               self.setTabStore("info")
@@ -183,6 +180,7 @@ import UserSampleListStore from "Store/UserSampleListStore"
           .remove() ;
       })
 
+      // Procedure for searched samples
       SampleListStore.on(SampleListStore.ActionTypes.changed, ()=>{
         let sample_list = SampleListStore.sample_list ;
         let candidate = sample_list.map((d)=>d.sample_id) ;
@@ -191,17 +189,13 @@ import UserSampleListStore from "Store/UserSampleListStore"
           return object
         }, {})
 
-        let color = d3.scaleSequential((t) => {
-          return d3.rgb(t*255, t*255, t*255) + ""
-        }) ;
+        let color = d3.scaleSequential((t) => d3.rgb(t*255, t*255, t*255) + "" ) ;
         color.domain([0,1])
 
         if(candidate.length !== 0){
           d3.selectAll(".dot")
             .filter((d) => candidate.includes(d.sample_id))
-            .style("fill", (d) => {
-              return color(sample_value[d.sample_id])
-            })
+            .style("fill", (d) => { color(sample_value[d.sample_id])})
             .style("visibility", "visible") ;
           d3.selectAll(".dot")
             .filter((d) => !(candidate.includes(d.sample_id)))
