@@ -65,6 +65,8 @@ import UserSampleListStore from "Store/UserSampleListStore"
                 .attr("height", svg_height)
                 .call(zoomBehavior)
                 .call(drag)
+                .on("dblclick", null)
+                .on("dblclick.zoom", null)
               .select("g") ;
           svg.select("rect")
             .attr("width", "100%")
