@@ -13,10 +13,12 @@ import SampleListAction from "Action/SampleListStoreAction"
           <button type="reset" name="reset" class="btn btn-default" onclick='{reset}'>Reset</button>
           <button type="submit" name="submit" class="btn btn-primary">Search</button>
         </form>
-        <h5>{message}</h5>
       </div>
     </div>
     <div class="menu row">
+      <div class="col-xs-6 col-lg-12" if={message}>
+        <h5>{message}</h5>
+      </div>
       <div class="col-xs-6 col-lg-12" if={sem_topic_list}>
         <div each="{sem_topic in sem_topic_list}" class="menu-category list-group">
           <div class="menu-category-name list-group-item active">
@@ -61,6 +63,13 @@ import SampleListAction from "Action/SampleListStoreAction"
         sampleListAction.resetStore();
       }
       sampleListAction.resetStore();
+
+      //To avoid mystery bug, focus out form
+      d3.select(".form-control")
+        .on("mouseout", () => {
+          document.getElementsByClassName("form-control")[0].blur() ;
+        })
+      ;
     })
 
     this.click_word = function(e){
