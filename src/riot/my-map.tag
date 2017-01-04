@@ -84,8 +84,8 @@ import UserSampleListStore from "Store/UserSampleListStore"
           self.x.domain([xMin, xMax]) ;
           self.y.domain([yMin, yMax]) ;
 
-          let topic_width = 60,
-              topic_height = 60 ;
+          let topic_width  = 30,
+              topic_height = 30 ;
 
           svg.append("g")
               .classed("topics", true)
@@ -108,7 +108,7 @@ import UserSampleListStore from "Store/UserSampleListStore"
               .data(data)
             .enter().append("circle")
               .classed("dot", true)
-              .attr("r", 2)
+              .attr("r", 1)
               .attr("transform", transform_sample)
               .style("fill", (d) => d.color )
               .on("click", (d) => {
@@ -197,7 +197,7 @@ import UserSampleListStore from "Store/UserSampleListStore"
         if(candidate.length !== 0){
           d3.selectAll(".dot")
             .filter((d) => candidate.includes(d.sample_id))
-            .style("fill", (d) => { color(sample_value[d.sample_id])})
+            .style("fill", (d) => color(sample_value[d.sample_id]))
             .style("visibility", "visible") ;
           d3.selectAll(".dot")
             .filter((d) => !(candidate.includes(d.sample_id)))
