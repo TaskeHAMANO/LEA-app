@@ -1,14 +1,14 @@
 <my-app>
   <div class="container-fluid container-extend">
     <div class="row row-0">
-      <div class="col-lg-3 col-xs-12 column-extend">
-        <my-panel/>
+      <div class="col-lg-3 col-sm-12 column-extend">
+        <my-panel></my-panel>
       </div>
-      <div class="col-lg-9 col-xs-12 column-extend">
-        <my-map/>
+      <div class="col-lg-9 col-sm-12 column-extend">
+        <my-map></my-map>
       </div>
     </div>
-  </section>
+  </div>
 
   <style scoped>
     .row, my-panel, my-map{
