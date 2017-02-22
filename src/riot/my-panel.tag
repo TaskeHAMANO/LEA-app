@@ -3,7 +3,7 @@ import TabAction  from "Action/TabStoreAction"
 
 <my-panel>
   <ul class="nav nav-tabs nav-justified">
-    <li each={tab, i in tabs} class="{tab:true, active:parent.isActiveTab(tab)}" onclick={ parent.changeTab }>
+    <li each={tab in tabs} class="{tab:true, active:parent.isActiveTab(tab)}" onclick={ parent.changeTab }>
       <a href="javascript:void(0)">{tab.label}</a>
     </li>
   </ul>
@@ -28,7 +28,7 @@ import TabAction  from "Action/TabStoreAction"
     var self = this;
     this.on("mount", () => {
       const tabAction = new TabAction();
-      self.setStore = (tab) => {
+      self.setTabStore = (tab) => {
         tabAction.setStore(tab);
       }
       tabAction.resetStore();
@@ -65,7 +65,7 @@ import TabAction  from "Action/TabStoreAction"
 
     // 受け取った値をself.activeTabへ代入する
     self.changeTab = function(e){
-      self.setStore(e.item.tab.type) ;
+      self.setTabStore(e.item.tab.type) ;
     };
   </script>
 
