@@ -4,22 +4,26 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
 <my-data>
   <div class="container-fluid">
     <div class="row">
-      <div class="well">
-        <h3>Download</h3>
-        <button type="button" name="down_png" onclick="{click_png}" class="btn btn-primary btn-block">Download as PNG</button>
-        <button type="button" name="down_svg" onclick="{click_svg}" class="btn btn-primary btn-block">Download as SVG</button>
+      <div class="col-sm-12">
+        <div class="well">
+          <h3>Download</h3>
+          <button type="button" name="down_png" onclick="{click_png}" class="btn btn-primary btn-block">Download as PNG</button>
+          <button type="button" name="down_svg" onclick="{click_svg}" class="btn btn-primary btn-block">Download as SVG</button>
+        </div>
       </div>
     </div>
     <div class="row">
-      <div class="well">
-        <h3>Upload</h3>
-        <form onSubmit={submit_file} id="upload_form">
-          <h4>Upload cluster file</h4>
-          <h5>.cluster file or tar.gz compressed cluster file</h5>
-          <input type="file" id="upload_file">
-          <button type="submit">Submit</button>
-        </form>
-        <h5>{message}</h5>
+      <div class="col-sm-12">
+        <div class="well">
+          <h3>Upload</h3>
+          <form onSubmit={submit_file} id="upload_form">
+            <h4>Upload cluster file</h4>
+            <h5>.cluster file or tar.gz compressed cluster file</h5>
+            <input type="file" id="upload_file">
+            <button type="submit">Submit</button>
+          </form>
+          <h5>{message}</h5>
+        </div>
       </div>
     </div>
   </div>
@@ -29,12 +33,10 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
     self.on("mount", ()=>{
       const userSampleListAction = new UserSampleListAction();
 
-      self.setStore = (sample_list) => {
+      self.setUserSampleListStore = (sample_list) => {
         userSampleListAction.setStore(sample_list) ;
       }
-      self.resetStore = () => {
-        userSampleListAction.resetStore() ;
-      }
+      userSampleListAction.resetStore() ;
 
       self.submit_file = function(){
         self.message = "Loading..."
@@ -59,7 +61,7 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
         .then((json) => {
           self.message = "Success"
           let new_data = json.new_sample_list;
-          self.setStore(new_data);
+          self.setUserSampleListStore(new_data);
           self.update();
         })
         .catch((err) => {
