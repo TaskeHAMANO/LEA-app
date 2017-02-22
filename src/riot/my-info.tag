@@ -65,7 +65,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
         <div id="word_chart" if={word_list}>
           <h3>Word</h3>
           <ul class="list-group">
-            <li each={word, i in word_list} class="list-group-item">{word.word}</li>
+            <li each={word in word_list} class="list-group-item">{word.word}</li>
           </ul>
         </div>
       </div>
@@ -207,7 +207,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
               self.update()
 
               let bar_size = self.bar_chart_size();
-              self.bar_width = bar_size[0] ; 
+              self.bar_width = bar_size[0] ;
               self.bar_height = bar_size[1] ;
               let elem_height = 42 ;
               let word_num = parseInt(self.bar_height) / elem_height - 1 ;
