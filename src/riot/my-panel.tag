@@ -3,7 +3,7 @@ import TabAction  from "Action/TabStoreAction"
 
 <my-panel>
   <ul class="nav nav-tabs nav-justified">
-    <li each={tab in tabs} class="{tab:true, active:parent.isActiveTab(tab)}" onclick={ parent.changeTab }>
+    <li each={tab in tabs} class="{tab:true, active:parent.isActiveTab(tab)}" onclick="{parent.changeTab}">
       <a href="javascript:void(0)">{tab.label}</a>
     </li>
   </ul>
