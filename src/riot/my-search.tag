@@ -53,24 +53,15 @@ import SampleListAction from "Action/SampleListStoreAction"
 
   <script>
     var self = this ;
-    this.on("mount", ()=>{
-      const sampleListAction = new SampleListAction();
+    const sampleListAction = new SampleListAction();
 
-      self.setStore = (sample_list) => {
-        sampleListAction.setStore(sample_list);
-      }
-      self.resetStore = () => {
-        sampleListAction.resetStore();
-      }
+    self.setStore = (sample_list) => {
+      sampleListAction.setStore(sample_list);
+    }
+    self.resetStore = () => {
       sampleListAction.resetStore();
-
-      //To avoid mystery bug, focus out form
-      d3.select(".form-control")
-        .on("mouseout", () => {
-          document.getElementsByClassName("form-control")[0].blur() ;
-        })
-      ;
-    })
+    }
+    sampleListAction.resetStore();
 
     this.click_word = function(e){
       let word = e.item.word_value.word ;
