@@ -2,11 +2,11 @@
 
   <div class="container-fluid container-extend">
     <div class="row row-0">
-      <div class="col-lg-3 col-sm-12 column-extend">
-        <my-panel></my-panel>
-      </div>
       <div class="col-lg-9 col-sm-12 column-extend">
         <my-map></my-map>
+      </div>
+      <div class="col-lg-3 col-sm-12 column-extend">
+        <my-panel></my-panel>
       </div>
     </div>
   </div>
