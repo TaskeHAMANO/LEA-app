@@ -53,23 +53,30 @@ import SampleListAction from "Action/SampleListStoreAction"
 
   <script>
     var self = this ;
-    const sampleListAction = new SampleListAction();
+    self.on("mount", ()=>{
+      //To avoid mystery bug, focus out form
+      d3.select(".form-control")
+        .on("mouseout", () => {
+          document.getElementsByClassName("form-control")[0].blur() ;
+        })
+      ;
+    })
 
+    const sampleListAction = new SampleListAction();
     self.setStore = (sample_list) => {
       sampleListAction.setStore(sample_list);
     }
     self.resetStore = () => {
       sampleListAction.resetStore();
     }
-    sampleListAction.resetStore();
 
-    this.click_word = function(e){
+    self.click_word = function(e){
       let word = e.item.word_value.word ;
       self.searched_text.value += ` ${word}`;
       self.update();
     }
 
-    this.reset = function(){
+    self.reset = function(){
       this.searched_text.value = "" ;
       delete this.eco_topic_list ;
       delete this.sem_topic_list ;
@@ -77,7 +84,7 @@ import SampleListAction from "Action/SampleListStoreAction"
       self.resetStore() ;
     }
 
-    this.submit = function(){
+    self.submit = function(){
       self.message = "Loading..."
       self.update();
 
