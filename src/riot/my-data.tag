@@ -20,7 +20,8 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
             <h4>Upload cluster file</h4>
             <h5>.cluster file or tar.gz compressed cluster file</h5>
             <input type="file" id="upload_file">
-            <button type="submit">Submit</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" name="reset" class="btn btn-default" onclick="{reset}">Reset</button>
           </form>
           <h5>{message}</h5>
         </div>
@@ -30,76 +31,82 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
 
   <script>
     var self = this ;
-    self.on("mount", ()=>{
-      const userSampleListAction = new UserSampleListAction();
 
-      self.setUserSampleListStore = (sample_list) => {
-        userSampleListAction.setStore(sample_list) ;
-      }
-      userSampleListAction.resetStore() ;
+    const userSampleListAction = new UserSampleListAction();
 
-      self.submit_file = function(){
-        self.message = "Loading..."
-        let input = document.getElementById("upload_file") ;
-        let data = new FormData() ;
-        data.append("cluster_file", input.files[0])
-        fetch("http://localhost:5000/new_sample", {
-          method: "post",
-          mode: "cors",
-          headers: {
-            "Accept": "application/json",
-          },
-          body: data
-        })
-        .then((response) => {
-          if(response.ok){
-            return response.json()
-          }else{
-            throw Error(response.statusText)
-          }
-        })
-        .then((json) => {
-          self.message = "Success"
-          let new_data = json.new_sample_list;
-          self.setUserSampleListStore(new_data);
-          self.update();
-        })
-        .catch((err) => {
-          self.message = `Error: ${err.message}`;
-          self.update();
-        })
-      }
+    self.setUserSampleListStore = (sample_list) => {
+      userSampleListAction.setStore(sample_list) ;
+    }
+    self.resetUserSampleListStore = () => {
+      userSampleListAction.resetStore()
+    }
 
-      self.click_png = function(){
-        let svg = (new XMLSerializer).serializeToString(d3.select("#map_svg").node());
-        let width = d3.select("#map_svg").attr("width");
-        let height = d3.select("#map_svg").attr("height")
-        let canvas = document.createElement('canvas');
-        canvas.width = width * 2;
-        canvas.height = height * 2;
+    self.reset= function(){
+      self.message = "";
+      self.resetUserSampleListStore() ;
+    }
 
-        let image = new Image;
-        image.src = 'data:image/svg+xml;charset=utf-8;base64,' + btoa(unescape(encodeURIComponent(svg)));
-        image.onload = function() {
-          // 2倍の大きさで保存
-          canvas.getContext('2d').drawImage(image, 0, 0, width, height, 0, 0, canvas.width, canvas.height);
-          let link = document.createElement('a');
-          link.href = canvas.toDataURL('image/png');
-          link.download = (new Date).getTime().toString(16) + '.png';
-          link.click();
-        };
-      }
+    self.submit_file = function(){
+      self.message = "Loading..."
+      let input = document.getElementById("upload_file") ;
+      let data = new FormData() ;
+      data.append("cluster_file", input.files[0])
+      fetch("http://localhost:5000/new_sample", {
+        method: "post",
+        mode: "cors",
+        headers: {
+          "Accept": "application/json",
+        },
+        body: data
+      })
+      .then((response) => {
+        if(response.ok){
+          return response.json()
+        }else{
+          throw Error(response.statusText)
+        }
+      })
+      .then((json) => {
+        self.message = "Success"
+        let new_data = json.new_sample_list;
+        self.setUserSampleListStore(new_data);
+        self.update();
+      })
+      .catch((err) => {
+        self.message = `Error: ${err.message}`;
+        self.update();
+      })
+    }
 
-      self.click_svg = function(){
-        let svg = (new XMLSerializer).serializeToString(document.getElementById("map_svg"));
-        let blob = new Blob([svg], { 'type': 'image/svg+xml' });
+    self.click_png = function(){
+      let svg = (new XMLSerializer).serializeToString(d3.select("#map_svg").node());
+      let width = d3.select("#map_svg").attr("width");
+      let height = d3.select("#map_svg").attr("height")
+      let canvas = document.createElement('canvas');
+      canvas.width = width * 2;
+      canvas.height = height * 2;
 
-        window.URL = window.URL || window.webkitURL;
+      let image = new Image;
+      image.src = 'data:image/svg+xml;charset=utf-8;base64,' + btoa(unescape(encodeURIComponent(svg)));
+      image.onload = function() {
+        // 2倍の大きさで保存
+        canvas.getContext('2d').drawImage(image, 0, 0, width, height, 0, 0, canvas.width, canvas.height);
         let link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = (new Date).getTime().toString(16) + '.svg';
+        link.href = canvas.toDataURL('image/png');
+        link.download = (new Date).getTime().toString(16) + '.png';
         link.click();
-      }
-    })
+      };
+    }
+
+    self.click_svg = function(){
+      let svg = (new XMLSerializer).serializeToString(document.getElementById("map_svg"));
+      let blob = new Blob([svg], { 'type': 'image/svg+xml' });
+
+      window.URL = window.URL || window.webkitURL;
+      let link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob);
+          link.download = (new Date).getTime().toString(16) + '.svg';
+      link.click();
+    }
   </script>
 </my-data>

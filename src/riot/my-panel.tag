@@ -26,23 +26,24 @@ import TabAction  from "Action/TabStoreAction"
 
   <script>
     var self = this;
-    this.on("mount", () => {
-      const tabAction = new TabAction();
-      self.setTabStore = (tab) => {
-        tabAction.setStore(tab);
-      }
-      tabAction.resetStore();
+    const tabAction = new TabAction();
 
-      TabStore.on(TabStore.ActionTypes.changed, () => {
-        self.activeTab = TabStore.tab;
-        self.update();
-      })
+    //StoreにTabの状態を保存する関数
+    self.setTabStore = (tab) => {
+      tabAction.setStore(tab);
+    }
 
+    //Storeの状態を検知してコンポーネント変数を書き換える
+    TabStore.on(TabStore.ActionTypes.changed, () => {
       self.activeTab = TabStore.tab;
       self.update();
     })
 
-    // データのパターン
+    //コンポーネント変数の初期化
+    self.activeTab = TabStore.tab;
+    self.update();
+
+    // Tabのパターン
     self.tabs = [
       {
         type:"search",
@@ -58,12 +59,12 @@ import TabAction  from "Action/TabStoreAction"
       }
     ]
 
-    // 入力されているtabがactiveか判断してboolを返す
+    // 入力されているtabがactiveか判断してboolを返すメソッド
     self.isActiveTab =  function(tab){
       return self.activeTab === tab.type;
     }
 
-    // 受け取った値をself.activeTabへ代入する
+    // 受け取った値をself.activeTabへ代入するメソッド
     self.changeTab = function(e){
       self.setTabStore(e.item.tab.type) ;
     };

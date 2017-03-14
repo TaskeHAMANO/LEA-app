@@ -10,6 +10,7 @@ import UserSampleListStore  from "Store/UserSampleListStore"
         <rect fill="black" width="100%" height="100%"></rect>
         <g class="samples"></g>
         <g class="topics"></g>
+        <g class="user_samples" width="100%" height="100%"></g>
       </g>
     </svg>
   </div>
@@ -46,15 +47,12 @@ import UserSampleListStore  from "Store/UserSampleListStore"
       tabAction.setStore(tab)
     } ;
     selectInfoAction.resetStore() ;
+
     // Procedure for uploaded samples
     UserSampleListStore.on(UserSampleListStore.ActionTypes.changed, ()=>{
       let user_sample_list = UserSampleListStore.user_sample_list ;
-      let svg = d3.select(".d3-map svg g") ;
-      let samples = svg.append("g")
-        .classed("user_samples", true)
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .selectAll(".user")
+      let svg = d3.select(".user_samples")
+      let samples = svg.selectAll(".user")
         .data(user_sample_list) ;
       samples.enter()
         .append("path")
@@ -69,6 +67,14 @@ import UserSampleListStore  from "Store/UserSampleListStore"
           }) ;
       samples.exit()
         .remove() ;
+      if(user_sample_list.length !== 0){
+        d3.selectAll(".dot")
+          .style("fill", (d) => d3.color(d.color).darker(5))
+        ;
+      }else{
+        d3.selectAll(".dot")
+          .style("fill", (d) => d.color)
+      }
     })
 
     // Procedure for searched samples
@@ -81,7 +87,11 @@ import UserSampleListStore  from "Store/UserSampleListStore"
       }, {})
       let color = d3.scaleSequential((t) => d3.rgb(t*255, t*255, t*255) + "" ) ;
       color.domain([0,1])
+      let svg = d3.select("#map_svg") ;
       if(candidate.length !== 0){
+        let top_sample_id = candidate[0] ;
+        let top_sample_data = self.sample_data.find(x => x["sample_id"] == top_sample_id) ;
+        let top_sample_cor = [self.svg_width / 2 - self.x(top_sample_data["x"]), self.svg_height / 2 - self.y(top_sample_data["y"])] ;
         d3.selectAll(".dot")
           .filter((d) => candidate.includes(d.sample_id))
           .style("fill", (d) => color(sample_value[d.sample_id]))
@@ -91,7 +101,14 @@ import UserSampleListStore  from "Store/UserSampleListStore"
           .style("visibility", "hidden") ;
         d3.selectAll(".cross")
           .style("visibility", "hidden") ;
+        let t = d3.zoomIdentity.translate(self.svg_width/2, self.svg_height/2).scale(4).translate(-self.x(top_sample_data["x"]), -self.y(top_sample_data["y"]))
+        svg.transition()
+          .duration(750)
+          .call(self.zoom.transform, t) ;
       }else{
+        svg.transition()
+          .duration(750)
+          .attr("transform", "translate(0,0)") ;
         d3.selectAll(".dot")
           .style("fill", (d) => d3.color(d.color))
           .style("visibility", "visible") ;
@@ -108,50 +125,47 @@ import UserSampleListStore  from "Store/UserSampleListStore"
           if (error) throw error
 
           // data processing
-          let sample_data = result[0] ;
-          let topic_data = result[1] ;
+          self.sample_data = result[0].sample_list ;
+          self.topic_data = result[1].topic_list ;
           let current_url = window.location.href ;
           let current_domain = current_url.replace(/index.html/g, "/data") ;
-          sample_data = sample_data.sample_list ;
-          topic_data = topic_data.topic_list ;
-          sample_data.forEach((d) => {
+          self.sample_data.forEach((d) => {
             d.x = +d.x ;
             d.y = +d.y ;
           });
-          topic_data.forEach((d) => {
+          self.topic_data.forEach((d) => {
               d.x = +d.x ;
               d.y = +d.y ;
               d.href = `${current_domain}/${d.topic_id}.png` ;
           });
 
           let chart_div = d3.select(".d3-map") ;
-          let svg_width = chart_div.node().getBoundingClientRect().width ;
-          let svg_height = chart_div.node().getBoundingClientRect().height ;
-          let zoomBehavior = d3.zoom()
-              .on("zoom", zoom)
-              .scaleExtent([1, 10]) ;
-          let svg = chart_div.select("svg")
-                .call(zoomBehavior)
-                .call(drag)
+          self.svg_width = chart_div.node().getBoundingClientRect().width ;
+          self.svg_height = chart_div.node().getBoundingClientRect().height ;
+          self.zoom = d3.zoom()
+              .scaleExtent([1, 10])
+              .on("zoom", zoomed) ;
+          let g = chart_div.select("#map_svg")
+                .call(self.zoom)
               .select("g") ;
 
           // assign scale
-          let xMax = d3.max(sample_data, (d) => d.x ) * 1.10,
-              xMin = d3.min(sample_data, (d) => d.x ) * 1.10,
-              yMax = d3.max(sample_data, (d) => d.y ) * 1.10,
-              yMin = d3.min(sample_data, (d) => d.y ) * 1.10 ;
+          let xMax = d3.max(self.sample_data, (d) => d.x ) * 1.10,
+              xMin = d3.min(self.sample_data, (d) => d.x ) * 1.10,
+              yMax = d3.max(self.sample_data, (d) => d.y ) * 1.10,
+              yMin = d3.min(self.sample_data, (d) => d.y ) * 1.10 ;
           self.x = d3.scaleLinear()
-            .range([0, svg_width])
+            .range([0, self.svg_width])
             .nice() ;
           self.y = d3.scaleLinear()
-            .range([svg_height, 0])
+            .range([self.svg_height, 0])
             .nice() ;
           self.x.domain([xMin, xMax]) ;
           self.y.domain([yMin, yMax]) ;
 
-          svg.select(".samples")
+          g.select(".samples")
             .selectAll(".dot")
-              .data(sample_data)
+              .data(self.sample_data)
             .enter().append("circle")
               .classed("dot", true)
               .attr("r", 1)
@@ -164,9 +178,9 @@ import UserSampleListStore  from "Store/UserSampleListStore"
 
           let topic_width  = 30,
               topic_height = 30 ;
-          svg.select(".topics")
+          g.select(".topics")
             .selectAll(".topicimage")
-              .data(topic_data)
+              .data(self.topic_data)
             .enter().append("image")
               .classed("topicimage", true)
               .attr("xlink:href", (d) => d.href)
@@ -178,19 +192,8 @@ import UserSampleListStore  from "Store/UserSampleListStore"
                 self.setSelectInfoStore({"topic_id": d.topic_id})
               }) ;
 
-          function zoom() {
-            svg.attr("transform", d3.event.transform) ;
-          }
-          function drag() {
-            d3.drag()
-              .on("drag",(d,i) => {
-                d.x += d3.event.dx
-                d.y += d3.event.dy
-                d3.select(this)
-                  .attr("transform", (d,i) => {
-                    return "translate(" + [d.x, d.y ] + ")"
-                  })
-              }) ;
+          function zoomed() {
+            g.attr("transform", d3.event.transform) ;
           }
           function transform_sample(d) {
             return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")";

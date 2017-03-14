@@ -10,8 +10,8 @@ import SampleListAction from "Action/SampleListStoreAction"
             <label><h3>Search</h3></label>
             <input type="text" name="searched_text" class="form-control">
           </div>
-          <button type="reset" name="reset" class="btn btn-default" onclick='{reset}'>Reset</button>
           <button type="submit" name="submit" class="btn btn-primary">Search</button>
+          <button type="reset" name="reset" class="btn btn-default" onclick='{reset}'>Reset</button>
         </form>
       </div>
     </div>
@@ -77,10 +77,10 @@ import SampleListAction from "Action/SampleListStoreAction"
     }
 
     self.reset = function(){
-      this.searched_text.value = "" ;
-      delete this.eco_topic_list ;
-      delete this.sem_topic_list ;
-      delete this.message ;
+      self.searched_text.value = "" ;
+      delete self.eco_topic_list ;
+      delete self.sem_topic_list ;
+      delete self.message ;
       self.resetStore() ;
     }
 
