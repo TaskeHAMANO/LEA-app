@@ -5,11 +5,11 @@ import UserSampleListStore  from "Store/UserSampleListStore"
 
 <my-map>
   <div class="d3-map">
-    <svg id="map_svg" xmlnx="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" width="100%" height="100%">
+    <svg id="map_svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="100%" height="100%">
       <g>
         <rect fill="black" width="100%" height="100%"></rect>
-        <g class="samples"></g>
         <g class="topics"></g>
+        <g class="samples"></g>
         <g class="user_samples" width="100%" height="100%"></g>
       </g>
     </svg>
@@ -51,8 +51,23 @@ import UserSampleListStore  from "Store/UserSampleListStore"
     // Procedure for uploaded samples
     UserSampleListStore.on(UserSampleListStore.ActionTypes.changed, ()=>{
       let user_sample_list = UserSampleListStore.user_sample_list ;
-      let svg = d3.select(".user_samples")
-      let samples = svg.selectAll(".user")
+      let user_sample_list_cor = user_sample_list.reduce((object, d, index) => {
+        object["x"].push(d["x"]) ;
+        object["y"].push(d["y"]) ;
+        return object
+      }, {"x":[], "y":[]})
+      let user_sample_list_center_cor = [
+        user_sample_list_cor["x"].reduce((sum, d, index) => {
+          sum += d ;
+          return sum
+        }, 0) / user_sample_list_cor["x"].length,
+        user_sample_list_cor["y"].reduce((sum, d, index) => {
+          sum += d ;
+          return sum
+        }, 0) / user_sample_list_cor["y"].length
+      ]
+      let svg = d3.select("#map_svg")
+      let samples = svg.select(".user_samples").selectAll(".user")
         .data(user_sample_list) ;
       samples.enter()
         .append("path")
@@ -71,16 +86,24 @@ import UserSampleListStore  from "Store/UserSampleListStore"
         d3.selectAll(".dot")
           .style("fill", (d) => d3.color(d.color).darker(5))
         ;
+        let t = d3.zoomIdentity.translate(self.svg_width/2 - self.x(user_sample_list_center_cor[0]), self.svg_height/2 - self.y(user_sample_list_center_cor[1]))
+        svg.transition()
+          .duration(750)
+          .call(self.zoom.transform, t) ;
       }else{
+        svg.transition()
+          .duration(750)
+          .call(self.zoom.transform, d3.zoomIdentity) ;
         d3.selectAll(".dot")
           .style("fill", (d) => d.color)
+          .style("visibility", "visible") ;
       }
     })
 
     // Procedure for searched samples
     SampleListStore.on(SampleListStore.ActionTypes.changed, ()=>{
       let sample_list = SampleListStore.sample_list ;
-      let candidate = sample_list.map((d)=>d.sample_id) ;
+      let candidate = sample_list.map((d) => d.sample_id) ;
       let sample_value = sample_list.reduce((object, d, index)=>{
         object[d.sample_id] = d.value ;
         return object
@@ -108,7 +131,7 @@ import UserSampleListStore  from "Store/UserSampleListStore"
       }else{
         svg.transition()
           .duration(750)
-          .attr("transform", "translate(0,0)") ;
+          .call(self.zoom.transform, d3.zoomIdentity) ;
         d3.selectAll(".dot")
           .style("fill", (d) => d3.color(d.color))
           .style("visibility", "visible") ;
@@ -128,7 +151,7 @@ import UserSampleListStore  from "Store/UserSampleListStore"
           self.sample_data = result[0].sample_list ;
           self.topic_data = result[1].topic_list ;
           let current_url = window.location.href ;
-          let current_domain = current_url.replace(/index.html/g, "/data") ;
+          let current_domain = current_url.replace(/index.html/g, "data") ;
           self.sample_data.forEach((d) => {
             d.x = +d.x ;
             d.y = +d.y ;
@@ -137,6 +160,7 @@ import UserSampleListStore  from "Store/UserSampleListStore"
               d.x = +d.x ;
               d.y = +d.y ;
               d.href = `${current_domain}/${d.topic_id}.png` ;
+              console.log(d.href) ;
           });
 
           let chart_div = d3.select(".d3-map") ;
@@ -163,19 +187,7 @@ import UserSampleListStore  from "Store/UserSampleListStore"
           self.x.domain([xMin, xMax]) ;
           self.y.domain([yMin, yMax]) ;
 
-          g.select(".samples")
-            .selectAll(".dot")
-              .data(self.sample_data)
-            .enter().append("circle")
-              .classed("dot", true)
-              .attr("r", 1)
-              .attr("transform", transform_sample)
-              .style("fill", (d) => d.color )
-              .on("click", (d) => {
-                self.setTabStore("info")
-                self.setSelectInfoStore({"sample_id": d.sample_id})
-              }) ;
-
+          // visualize topics
           let topic_width  = 30,
               topic_height = 30 ;
           g.select(".topics")
@@ -190,6 +202,20 @@ import UserSampleListStore  from "Store/UserSampleListStore"
               .on("click", (d) => {
                 self.setTabStore("info")
                 self.setSelectInfoStore({"topic_id": d.topic_id})
+              }) ;
+
+          // visualize samples
+          g.select(".samples")
+            .selectAll(".dot")
+              .data(self.sample_data)
+            .enter().append("circle")
+              .classed("dot", true)
+              .attr("r", 1)
+              .attr("transform", transform_sample)
+              .style("fill", (d) => d.color )
+              .on("click", (d) => {
+                self.setTabStore("info")
+                self.setSelectInfoStore({"sample_id": d.sample_id})
               }) ;
 
           function zoomed() {
