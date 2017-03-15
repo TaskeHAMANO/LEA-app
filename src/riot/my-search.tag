@@ -63,10 +63,10 @@ import SampleListAction from "Action/SampleListStoreAction"
     })
 
     const sampleListAction = new SampleListAction();
-    self.setStore = (sample_list) => {
+    self.setSampleListStore = (sample_list) => {
       sampleListAction.setStore(sample_list);
     }
-    self.resetStore = () => {
+    self.resetSampleListStore = () => {
       sampleListAction.resetStore();
     }
 
@@ -81,7 +81,7 @@ import SampleListAction from "Action/SampleListStoreAction"
       delete self.eco_topic_list ;
       delete self.sem_topic_list ;
       delete self.message ;
-      self.resetStore() ;
+      self.resetSampleListStore() ;
     }
 
     self.submit = function(){
@@ -105,7 +105,7 @@ import SampleListAction from "Action/SampleListStoreAction"
             let sem_topics = result[2];
 
             if(sample_list.sample_list.length != 0){
-              self.setStore(sample_list.sample_list) ;
+              self.setSampleListStore(sample_list.sample_list) ;
               self.eco_topic_list = eco_topics.topic_list ;
               self.sem_topic_list = sem_topics.topic_list ;
               self.message = "Success." ;
