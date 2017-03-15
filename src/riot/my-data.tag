@@ -16,7 +16,7 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
       <div class="col-sm-12">
         <div class="well">
           <h3>Upload</h3>
-          <form onSubmit={submit_file} id="upload_form">
+          <form onSubmit={submit} id="upload_form">
             <h4>Upload cluster file</h4>
             <h5>.cluster file or tar.gz compressed cluster file</h5>
             <input type="file" id="upload_file">
@@ -41,12 +41,12 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
       userSampleListAction.resetStore()
     }
 
-    self.reset= function(){
-      self.message = "";
+    self.reset = function(){
+      delete self.message ;
       self.resetUserSampleListStore() ;
     }
 
-    self.submit_file = function(){
+    self.submit = function(){
       self.message = "Loading..."
       let input = document.getElementById("upload_file") ;
       let data = new FormData() ;
@@ -79,10 +79,10 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
     }
 
     self.click_png = function(){
-      let svg = (new XMLSerializer).serializeToString(d3.select("#map_svg").node());
-      let width = d3.select("#map_svg").attr("width");
-      let height = d3.select("#map_svg").attr("height")
-      let canvas = document.createElement('canvas');
+      let svg = (new XMLSerializer).serializeToString(d3.select("#map_svg").node()) ;
+      let width = d3.select("#map_svg").node().getBoundingClientRect().width ;
+      let height = d3.select("#map_svg").node().getBoundingClientRect().height;
+      let canvas = document.createElement('canvas') ;
       canvas.width = width * 2;
       canvas.height = height * 2;
 
