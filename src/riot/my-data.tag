@@ -7,7 +7,6 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
       <div class="col-sm-12">
         <div class="well">
           <h3>Download</h3>
-          <button type="button" name="down_png" onclick="{click_png}" class="btn btn-primary btn-block">Download as PNG</button>
           <button type="button" name="down_svg" onclick="{click_svg}" class="btn btn-primary btn-block">Download as SVG</button>
         </div>
       </div>
@@ -76,26 +75,6 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
         self.message = `Error: ${err.message}`;
         self.update();
       })
-    }
-
-    self.click_png = function(){
-      let svg = (new XMLSerializer).serializeToString(d3.select("#map_svg").node()) ;
-      let width = d3.select("#map_svg").node().getBoundingClientRect().width ;
-      let height = d3.select("#map_svg").node().getBoundingClientRect().height;
-      let canvas = document.createElement('canvas') ;
-      canvas.width = width * 2;
-      canvas.height = height * 2;
-
-      let image = new Image;
-      image.src = 'data:image/svg+xml;charset=utf-8;base64,' + btoa(unescape(encodeURIComponent(svg)));
-      image.onload = function() {
-        // 2倍の大きさで保存
-        canvas.getContext('2d').drawImage(image, 0, 0, width, height, 0, 0, canvas.width, canvas.height);
-        let link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = (new Date).getTime().toString(16) + '.png';
-        link.click();
-      };
     }
 
     self.click_svg = function(){
