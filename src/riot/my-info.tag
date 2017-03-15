@@ -28,10 +28,12 @@ import SelectInfoStore      from "Store/SelectInfoStore"
       </div>
       <div class="row" if={ metadata.sample_mdb_url && metadata.sample_ncbi_url }>
         <div class="col-xs-6">
-          <h4> MicrobeDB.jp: </h4> <a href={metadata.sample_mdb_url}>Link</a>
+          <h4> MicrobeDB.jp: </h4> 
+          <a href={metadata.sample_mdb_url} target="_blank">Link</a>
         </div>
         <div class="col-xs-6">
-          <h4> NCBI: </h4> <a href={metadata.sample_ncbi_url}>Link</a>
+          <h4> NCBI: </h4> 
+          <a href={metadata.sample_ncbi_url} target="_blank">Link</a>
         </div>
       </div>
     </div>
@@ -46,7 +48,8 @@ import SelectInfoStore      from "Store/SelectInfoStore"
           <h4> Topic ID: </h4> {metadata.topic_id}
           <h6> License: </h6> {metadata.license}
           <h6> Attribution: </h6> {metadata.attribution}
-          <h6> Source: </h6> <a href={metadata.image_url}>Link</a>
+          <h6> Source: </h6> 
+          <a href={metadata.image_url} target="_blank">Link</a>
         </div>
       </div>
     </div>
@@ -80,6 +83,15 @@ import SelectInfoStore      from "Store/SelectInfoStore"
 
   <script>
     var self = this;
+    self.bar_width = 0 ;
+    self.bar_height = 0 ;
+
+    self.on("mount", ()=>{
+      self.topic_element_name = "topic_id" ;
+      self.taxon_element_name = "taxonomy_name" ;
+    });
+
+    // Acquire topic_id - color relationship
     fetch("http://localhost:5000/topic/location")
       .then((response) => response.json())
       .then((json) => {
@@ -90,6 +102,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
         self.topic_color = color ;
       }) ;
 
+    // Acquire taxon - color relationship
     fetch("http://localhost:5000/taxonomy/color")
       .then((response) => response.json())
       .then((json) => {
@@ -100,6 +113,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
         self.taxon_color = color ;
       }) ;
 
+    // method which determine property status
     self.has_project_id = () => self.metadata.hasOwnProperty("project_id") ;
 
     self.has_sample_id  = () => self.metadata.hasOwnProperty("sample_id") ;
@@ -118,111 +132,98 @@ import SelectInfoStore      from "Store/SelectInfoStore"
       return [bar_width, bar_height];
     } ;
 
-    self.on("mount", ()=>{
-      self.topic_element_name = "topic_id" ;
-      self.taxon_element_name = "taxonomy_name" ;
-
-      SelectInfoStore.on(SelectInfoStore.ActionTypes.changed, ()=>{
-        self.metadata = {}
-        self.metadata = SelectInfoStore.select_info;
-        if(self.has_sample_id()){
-          delete self.word_list ;
-          if(self.has_project_id()){
-            d3.queue()
-              .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/taxonomies/genus`)
-              .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/topics`)
-              .awaitAll((error, result) => {
-                if (error) throw error
-
-                let taxon = result[0]
-                let topics = result[1]
-
-                self.update()
-
-                let bar_size = self.bar_chart_size() ;
-                self.bar_width = bar_size[0] ;
-                self.bar_height = bar_size[1] ;
-
-                let taxon_list = {}
-                taxon_list[self.metadata.sample_id] = taxon.taxonomy_list ;
-                self.taxon_list = taxon_list ;
-
-                let topic_list = {}
-                topic_list[self.metadata.sample_id] = topics.topic_list ;
-                self.topic_list = topic_list ;
-
-                self.update();
-              })
-            ;
-          }else{
-            d3.queue()
-              .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/metadata`)
-              .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/taxonomies/genus`)
-              .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/topics`)
-              .awaitAll((error, result) => {
-                if (error) throw error
-
-                let metadata = result[0]
-                let taxon = result[1]
-                let topics = result[2]
-
-                self.metadata["sample_name"] = metadata.metadata.SampleName;
-                self.metadata["sample_ncbi_url"] = `http://ncbi.nlm.nih.gov/sra/${self.metadata.sample_id}`;
-                self.metadata["sample_mdb_url"] = `http://microbedb.jp/MDBdemo/search/?q1=${self.metadata.sample_id}&q1_cat=sample&q1_param_srs_id=${self.metadata.sample_id}` ;
-                self.update()
-
-                let bar_size = self.bar_chart_size();
-                self.bar_width = bar_size[0] ; 
-                self.bar_height = bar_size[1] ;
-
-                let taxon_list = {}
-                taxon_list[self.metadata.sample_id] = taxon.taxonomy_list ;
-                self.taxon_list = taxon_list ;
-
-                let topic_list = {}
-                topic_list[self.metadata.sample_id] = topics.topic_list ;
-                self.topic_list = topic_list ;
-
-                self.update();
-              })
-            ;
-          }
-        }else if(self.has_topic_id()){
-          delete self.topic_list ;
+    SelectInfoStore.on(SelectInfoStore.ActionTypes.changed, ()=>{
+      self.metadata = {}
+      self.metadata = SelectInfoStore.select_info;
+      if(self.has_sample_id()){
+        delete self.word_list ;
+        if(self.has_project_id()){
           d3.queue()
-            .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/metadata`)
-            .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/taxonomies/genus`)
-            .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/words?n_word_limit=15`)
+            .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/taxonomies/genus`)
+            .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/topics`)
+            .awaitAll((error, result) => {
+              if (error) throw error
+
+              let taxon = result[0]
+              let topic = result[1]
+
+              self.update()
+
+              let bar_size = self.bar_chart_size() ;
+              self.bar_width = bar_size[0] ;
+              self.bar_height = bar_size[1] ;
+
+              self.taxon_list = {}
+              self.taxon_list[self.metadata.sample_id] = taxon.taxonomy_list ;
+
+              self.topic_list = {}
+              self.topic_list[self.metadata.sample_id] = topic.topic_list ;
+
+              self.update();
+            }) ;
+        }else{
+          d3.queue()
+            .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/metadata`)
+            .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/taxonomies/genus`)
+            .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/topics`)
             .awaitAll((error, result) => {
               if (error) throw error
 
               let metadata = result[0]
               let taxon = result[1]
-              let words = result[2]
+              let topic = result[2]
 
-              self.metadata["attribution"] = metadata.metadata.Attribution ;
-              self.metadata["image_url"] = metadata.metadata.ImageURL ;
-              self.metadata["license"] = metadata.metadata.License ;
-
+              self.metadata["sample_name"] = metadata.metadata.SampleName;
+              self.metadata["sample_ncbi_url"] = `http://ncbi.nlm.nih.gov/sra/${self.metadata.sample_id}`;
+              self.metadata["sample_mdb_url"] = `http://microbedb.jp/MDBdemo/search/?q1=${self.metadata.sample_id}&q1_cat=sample&q1_param_srs_id=${self.metadata.sample_id}` ;
               self.update()
 
               let bar_size = self.bar_chart_size();
               self.bar_width = bar_size[0] ;
               self.bar_height = bar_size[1] ;
-              let elem_height = 42 ;
-              let word_num = parseInt(self.bar_height) / elem_height - 1 ;
 
-              let taxon_list = {}
-              taxon_list[''+self.metadata.topic_id] = taxon.taxonomy_list ;
-              self.taxon_list = taxon_list ;
+              self.taxon_list = {} ;
+              self.taxon_list[self.metadata.sample_id] = taxon.taxonomy_list ;
 
-              self.word_list = words.word_list.slice(0,word_num) ;
+              self.topic_list = {} ;
+              self.topic_list[self.metadata.sample_id] = topic.topic_list ;
 
               self.update();
-            })
-          ;
+            }) ;
         }
-      });
+      }else if(self.has_topic_id()){
+        delete self.topic_list ;
+        d3.queue()
+          .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/metadata`)
+          .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/taxonomies/genus`)
+          .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/words?n_word_limit=15`)
+          .awaitAll((error, result) => {
+            if (error) throw error
+
+            let metadata = result[0]
+            let taxon = result[1]
+            let words = result[2]
+
+            self.metadata["attribution"] = metadata.metadata.Attribution ;
+            self.metadata["image_url"] = metadata.metadata.ImageURL ;
+            self.metadata["license"] = metadata.metadata.License ;
+
+            self.update()
+
+            let bar_size = self.bar_chart_size();
+            self.bar_width = bar_size[0] ;
+            self.bar_height = bar_size[1] ;
+            let elem_height = 42 ;
+            let word_num = parseInt(self.bar_height) / elem_height - 1 ;
+
+            self.taxon_list = {}
+            self.taxon_list['' + self.metadata.topic_id] = taxon.taxonomy_list ;
+
+            self.word_list = words.word_list.slice(0,word_num) ;
+
+            self.update();
+          });
+      }
     });
   </script>
 </my-info>
