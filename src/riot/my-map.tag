@@ -195,19 +195,39 @@ import UserSampleListStore  from "Store/UserSampleListStore"
           // visualize topics
           let topic_width  = 30,
               topic_height = 30 ;
-          g.select(".topics")
-            .selectAll(".topicimage")
+          let topics = g.select(".topics")
+            .selectAll(".topicframe")
               .data(self.topic_data)
-            .enter().append("image")
-              .classed("topicimage", true)
-              .attr("xlink:href", (d) => d.href)
-              .attr("width", topic_width)
-              .attr("height", topic_height)
+            .enter().append("g")
+              .classed("topicframe", true)
               .attr("transform", transform_topic)
-              .on("click", (d) => {
-                self.setTabStore("info")
-                self.setSelectInfoStore({"topic_id": d.topic_id})
-              }) ;
+              .attr("id", (d) => d.topic_id) ;
+          topics.append("circle")
+            .classed("topiccircle", true)
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
+            .attr("cx", 15)
+            .attr("cy", 15)
+            .attr("r", 15) ;
+          topics.append("image")
+            .classed("topicimage", true)
+            .attr("xlink:href", (d) => d.href)
+            .attr("width", topic_width)
+            .attr("height", topic_height)
+            .on("click", (d) => {
+              let parent_topic = d3.event.target.parentNode;
+              d3.selectAll(".selected_topic")
+                .classed("selected_topic", false)
+                .classed("pre_selected_topic", true)
+                .select(".topiccircle")
+                  .attr("stroke", "gray") ;
+              d3.select(parent_topic)
+                .classed("selected_topic", true)
+                .select(".topiccircle")
+                  .attr("stroke", "white") ;
+              self.setTabStore("info")
+              self.setSelectInfoStore({"topic_id": d.topic_id})
+            }) ;
 
           // visualize samples
           g.select(".samples")
@@ -215,6 +235,7 @@ import UserSampleListStore  from "Store/UserSampleListStore"
               .data(self.sample_data)
             .enter().append("circle")
               .classed("dot", true)
+              .attr("stroke-width", 0.5)
               .attr("r", 1)
               .attr("transform", transform_sample)
               .style("fill", (d) => d.color )
@@ -225,7 +246,6 @@ import UserSampleListStore  from "Store/UserSampleListStore"
                   .classed("pre_selected_dot", true)
                 d3.select(d3.event.target)
                   .attr("stroke", "white")
-                  .attr("stroke-width", 0.5)
                   .classed("selected_dot", true)
                 ;
                 self.setTabStore("info")
