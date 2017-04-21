@@ -175,7 +175,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
 
               self.metadata["sample_name"] = metadata.metadata.SampleName;
               self.metadata["sample_ncbi_url"] = `http://ncbi.nlm.nih.gov/sra/${self.metadata.sample_id}`;
-              self.metadata["sample_mdb_url"] = `http://microbedb.jp/MDBdemo/search/?q1=${self.metadata.sample_id}&q1_cat=sample&q1_param_srs_id=${self.metadata.sample_id}` ;
+              self.metadata["sample_mdb_url"] = `http://microbedb.jp/MDB/search/?q1=${self.metadata.sample_id}&q1_cat=sample&q1_param_srs_id=${self.metadata.sample_id}` ;
               self.update()
 
               let bar_size = self.bar_chart_size();
