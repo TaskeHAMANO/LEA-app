@@ -82,6 +82,15 @@ import SampleListAction from "Action/SampleListStoreAction"
       delete self.sem_topic_list ;
       delete self.message ;
       self.resetSampleListStore() ;
+      d3.select(".d3-map")
+        .selectAll(".selected_dot")
+          .classed(".selected_dot", false)
+          .attr("stroke", "none") ;
+      d3.select(".d3-map")
+        .selectAll(".selected_topic")
+          .classed(".selected_topic", false)
+          .select("circle")
+            .attr("stroke", "none") ;
     }
 
     self.submit = function(){

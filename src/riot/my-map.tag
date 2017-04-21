@@ -1,7 +1,13 @@
+// Store clicked sample_id in map
 import SelectInfoAction     from "Action/SelectInfoStoreAction"
+// Store tab information
 import TabAction            from "Action/TabStoreAction"
+// Watch sample_id_list of searched result
 import SampleListStore      from "Store/SampleListStore"
+// Watch sample_id_list of user input result
 import UserSampleListStore  from "Store/UserSampleListStore"
+// Watch element of mouseon of barchart
+import MouseOnStore         from "Store/MouseOnStore"
 
 <my-map>
   <div class="d3-map">
@@ -146,6 +152,28 @@ import UserSampleListStore  from "Store/UserSampleListStore"
       }
     })
 
+    // Procedure for topics which is mouseovered in bar chart
+    MouseOnStore.on(MouseOnStore.ActionTypes.changed, () => {
+      // get element information from store
+      let mouse_on_element = MouseOnStore.mouseon ;
+      let mouse_on_element_id = `#topic${""+mouse_on_element}`
+      // check datatype to detect whether input is topic or not (latter is taxon)
+      if (typeof(mouse_on_element) == "number"){
+        // Remove stroke attribution from pre-selected topic
+        d3.selectAll(".selected_topic")
+          .classed("selected_topic", false)
+          .select("circle")
+            .attr("stroke", "none") 
+            .attr("stroke-dasharray", "none") ;
+        // Add color to mouseovered element's stroke
+        d3.select(mouse_on_element_id)
+            .classed("selected_topic", true)
+            .select("circle")
+              .attr("stroke", "white")
+              .attr("stroke-dasharray", "4, 8") ;
+      }
+    })
+
     function initialize_map(){
       d3.queue()
         .defer(d3.json, "http://snail.nig.ac.jp/leaapi/sample/location")
@@ -201,14 +229,14 @@ import UserSampleListStore  from "Store/UserSampleListStore"
             .enter().append("g")
               .classed("topicframe", true)
               .attr("transform", transform_topic)
-              .attr("id", (d) => d.topic_id) ;
+              .attr("id", (d) => `topic${d.topic_id}`) ;
           topics.append("circle")
             .classed("topiccircle", true)
             .attr("stroke", "black")
-            .attr("stroke-width", 2)
-            .attr("cx", 15)
-            .attr("cy", 15)
-            .attr("r", 15) ;
+            .attr("stroke-width", 4)
+            .attr("cx", topic_width/2)
+            .attr("cy", topic_height/2)
+            .attr("r", topic_width/2) ;
           topics.append("image")
             .classed("topicimage", true)
             .attr("xlink:href", (d) => d.href)
@@ -216,17 +244,20 @@ import UserSampleListStore  from "Store/UserSampleListStore"
             .attr("height", topic_height)
             .on("click", (d) => {
               let parent_topic = d3.event.target.parentNode;
+              // Remove stroke attribution from pre-selected topic
               d3.selectAll(".selected_topic")
                 .classed("selected_topic", false)
-                .classed("pre_selected_topic", true)
-                .select(".topiccircle")
-                  .attr("stroke", "gray") ;
+                .select("circle")
+                  .attr("stroke", "none")
+                  .attr("stroke-dasharray", "none") ;
+              // Add stroke attribution to selected topic
               d3.select(parent_topic)
                 .classed("selected_topic", true)
-                .select(".topiccircle")
-                  .attr("stroke", "white") ;
-              self.setTabStore("info")
-              self.setSelectInfoStore({"topic_id": d.topic_id})
+                .select("circle")
+                  .attr("stroke", "white")
+                  .attr("stroke-dasharray", "none") ;
+              self.setTabStore("info") ;
+              self.setSelectInfoStore({"topic_id": d.topic_id}) ;
             }) ;
 
           // visualize samples
@@ -240,14 +271,14 @@ import UserSampleListStore  from "Store/UserSampleListStore"
               .attr("transform", transform_sample)
               .style("fill", (d) => d.color )
               .on("click", (d) => {
+                // Remove stroke attribution from pre-selected dot
                 d3.selectAll(".selected_dot")
-                  .attr("stroke", "gray")
-                  .classed("selected_dot", false)
-                  .classed("pre_selected_dot", true)
+                  .attr("stroke", "none")
+                  .classed("selected_dot", false) ;
+                // Add stroke attribution to selected dot
                 d3.select(d3.event.target)
                   .attr("stroke", "white")
-                  .classed("selected_dot", true)
-                ;
+                  .classed("selected_dot", true) ;
                 self.setTabStore("info")
                 self.setSelectInfoStore({"sample_id": d.sample_id})
               }) ;

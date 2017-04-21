@@ -1,3 +1,6 @@
+import MouseOnStore from "Store/MouseOnStore"
+import MouseOnAction from "Action/MouseOnStoreAction"
+
 <my-bar>
   <div id={opts.chart_id}>
     <div class="d3-chart svg-container">
@@ -41,6 +44,15 @@
 
   <script>
     var self = this;
+
+    const mouseOnAction = new MouseOnAction();
+    self.setMouseOnStore = (mouse_on) => {
+      mouseOnAction.setStore(mouse_on)
+    }
+    self.resetMouseOnStore = () => {
+      mouseOnAction.resetStore()
+    }
+
     this.on("mount", ()=>{
       let data = opts.data ;
       let element_name = opts.element_name ;
@@ -62,7 +74,6 @@
         visualize_bar_chart(data, element_name, chart_id, color, width, height);
       })
     })
-
 
     function get_color_scale(color, element_list){
       if(typeof color == "undefined"){
@@ -126,6 +137,7 @@
               .style("left", `${d3.event.layerX}px`)
               .style("top", `${d3.event.layerY}px`)
               .html(() => `<p>${element_name}: ${d.key}</p>`) ;
+            self.setMouseOnStore(d.key) ;
           })
           .on("mouseout", (d) =>{
             tip.style("visibility", "hidden")
