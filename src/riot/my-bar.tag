@@ -63,7 +63,6 @@
       })
     })
 
-    self.margin = {top:10, bottom:0, left:30, right:0}
 
     function get_color_scale(color, element_list){
       if(typeof color == "undefined"){
@@ -79,8 +78,9 @@
     function visualize_bar_chart(data, element_name, chart_id, color, width, height){
       let svg_width = width ;
       let svg_height = height ;
-      let bar_width  = svg_width * 0.9 ;
+      let bar_width  = svg_width * 0.6 ;
       let bar_height = svg_height * 0.9 ;
+      let margin = {top:svg_height*0.05, bottom:0, left:svg_width*0.4, right:0}
       let sample_list = [] ;
       for (let key in data){
         sample_list.push(key)
@@ -109,11 +109,13 @@
 
       let svg = d3.select(`#${chart_id} .d3-chart svg`)
         .append("g")
-          .attr("transform", `translate(${self.margin.left}, ${self.margin.top})`) ;
+          .attr("transform", `translate(${margin.left}, ${margin.top})`) ;
       let tip = d3.select(`#${chart_id} .d3-tooltip`)
         .style("visibility", "hidden") ;
 
-      svg.selectAll(".serie")
+      svg.append("g")
+        .attr("class", "series")
+        .selectAll(".serie")
         .data(stack(data))
         .enter()
         .append("g")
@@ -141,17 +143,17 @@
 
       svg.append("g")
         .attr("class", "axis axis--x")
-        .attr("transform", `translate(0,${bar_height})`)
+        .attr("transform", `translate(0, ${bar_height})`)
         .call(d3.axisBottom(x)) ;
 
       svg.append("g")
         .attr("class", "axis axis--y")
         .call(d3.axisLeft(y))
       .append("text")
-        .attr("x", 2)
-        .attr("y", y(y.ticks(10).pop()))
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "start")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -0.5 * margin.left)
+        .attr("x", 0)
+        .attr("font-size", "14px")
         .attr("fill", "#000")
         .text("Abundance") ;
     }
