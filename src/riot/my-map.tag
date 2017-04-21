@@ -219,6 +219,15 @@ import UserSampleListStore  from "Store/UserSampleListStore"
               .attr("transform", transform_sample)
               .style("fill", (d) => d.color )
               .on("click", (d) => {
+                d3.selectAll(".selected_dot")
+                  .attr("stroke", "gray")
+                  .classed("selected_dot", false)
+                  .classed("pre_selected_dot", true)
+                d3.select(d3.event.target)
+                  .attr("stroke", "white")
+                  .attr("stroke-width", 0.5)
+                  .classed("selected_dot", true)
+                ;
                 self.setTabStore("info")
                 self.setSelectInfoStore({"sample_id": d.sample_id})
               }) ;
