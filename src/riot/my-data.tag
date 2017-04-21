@@ -50,7 +50,7 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
       let input = document.getElementById("upload_file") ;
       let data = new FormData() ;
       data.append("cluster_file", input.files[0])
-      fetch("http://localhost:5000/new_sample", {
+      fetch("http://snail.nig.ac.jp/leaapi/new_sample", {
         method: "post",
         mode: "cors",
         headers: {

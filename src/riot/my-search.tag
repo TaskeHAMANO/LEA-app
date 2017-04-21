@@ -90,9 +90,9 @@ import SampleListAction from "Action/SampleListStoreAction"
 
       if(self.searched_text.value){
         d3.queue()
-          .defer(d3.json, `http://localhost:5000/string/${encodeURIComponent(self.searched_text.value)}/samples?n_limit=2000`)
-          .defer(d3.json, `http://localhost:5000/string/${encodeURIComponent(self.searched_text.value)}/topics/ecological?n_element_limit=6`)
-          .defer(d3.json, `http://localhost:5000/string/${encodeURIComponent(self.searched_text.value)}/topics/semantic?n_element_limit=6`)
+          .defer(d3.json, `http://snail.nig.ac.jp/leaapi/string/${encodeURIComponent(self.searched_text.value)}/samples?n_limit=2000`)
+          .defer(d3.json, `http://snail.nig.ac.jp/leaapi/string/${encodeURIComponent(self.searched_text.value)}/topics/ecological?n_element_limit=6`)
+          .defer(d3.json, `http://snail.nig.ac.jp/leaapi/string/${encodeURIComponent(self.searched_text.value)}/topics/semantic?n_element_limit=6`)
           .awaitAll((error, result) => {
             if (error){
               self.message = `Error: ${error.target.statusText}` ;

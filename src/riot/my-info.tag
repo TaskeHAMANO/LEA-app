@@ -92,7 +92,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
     });
 
     // Acquire topic_id - color relationship
-    fetch("http://localhost:5000/topic/location")
+    fetch("http://snail.nig.ac.jp/leaapi/topic/location")
       .then((response) => response.json())
       .then((json) => {
         let color = json.topic_list.reduce((object, d, index) => {
@@ -103,7 +103,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
       }) ;
 
     // Acquire taxon - color relationship
-    fetch("http://localhost:5000/taxonomy/color")
+    fetch("http://snail.nig.ac.jp/leaapi/taxonomy/color")
       .then((response) => response.json())
       .then((json) => {
         let color = json.taxonomy_list.reduce((object, d, index) => {
@@ -139,8 +139,8 @@ import SelectInfoStore      from "Store/SelectInfoStore"
         delete self.word_list ;
         if(self.has_project_id()){
           d3.queue()
-            .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/taxonomies/genus`)
-            .defer(d3.json, `http://localhost:5000/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/topics`)
+            .defer(d3.json, `http://snail.nig.ac.jp/leaapi/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/taxonomies/genus`)
+            .defer(d3.json, `http://snail.nig.ac.jp/leaapi/newsample/${self.metadata.project_id}/${self.metadata.sample_id}/topics`)
             .awaitAll((error, result) => {
               if (error) throw error
 
@@ -163,9 +163,9 @@ import SelectInfoStore      from "Store/SelectInfoStore"
             }) ;
         }else{
           d3.queue()
-            .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/metadata`)
-            .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/taxonomies/genus`)
-            .defer(d3.json, `http://localhost:5000/sample/${self.metadata.sample_id}/topics`)
+            .defer(d3.json, `http://snail.nig.ac.jp/leaapi/sample/${self.metadata.sample_id}/metadata`)
+            .defer(d3.json, `http://snail.nig.ac.jp/leaapi/sample/${self.metadata.sample_id}/taxonomies/genus`)
+            .defer(d3.json, `http://snail.nig.ac.jp/leaapi/sample/${self.metadata.sample_id}/topics`)
             .awaitAll((error, result) => {
               if (error) throw error
 
@@ -194,9 +194,9 @@ import SelectInfoStore      from "Store/SelectInfoStore"
       }else if(self.has_topic_id()){
         delete self.topic_list ;
         d3.queue()
-          .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/metadata`)
-          .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/taxonomies/genus`)
-          .defer(d3.json, `http://localhost:5000/topic/${self.metadata.topic_id}/words?n_word_limit=15`)
+          .defer(d3.json, `http://snail.nig.ac.jp/leaapi/topic/${self.metadata.topic_id}/metadata`)
+          .defer(d3.json, `http://snail.nig.ac.jp/leaapi/topic/${self.metadata.topic_id}/taxonomies/genus`)
+          .defer(d3.json, `http://snail.nig.ac.jp/leaapi/topic/${self.metadata.topic_id}/words?n_word_limit=15`)
           .awaitAll((error, result) => {
             if (error) throw error
 

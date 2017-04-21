@@ -75,7 +75,13 @@ import UserSampleListStore  from "Store/UserSampleListStore"
           .classed("user", true)
           .attr("d", d3.symbol().size(30).type(d3.symbolCross))
           .attr("transform", (d) => `translate(${self.x(d.x)},${self.y(d.y)})`)
-          .style("fill", "white")
+          .style("fill", (d) => {
+            if(d.color){
+              return d.color
+            }else{
+              return "white"
+            }
+          })
           .on("click", (d) => {
             self.setTabStore("info")
             self.setSelectInfoStore({"sample_id": d.sample_id, "project_id": d.project_id})
@@ -142,8 +148,8 @@ import UserSampleListStore  from "Store/UserSampleListStore"
 
     function initialize_map(){
       d3.queue()
-        .defer(d3.json, "http://localhost:5000/sample/location")
-        .defer(d3.json, "http://localhost:5000/topic/location")
+        .defer(d3.json, "http://snail.nig.ac.jp/leaapi/sample/location")
+        .defer(d3.json, "http://snail.nig.ac.jp/leaapi/topic/location")
         .awaitAll((error, result) =>{
           if (error) throw error
 
@@ -160,7 +166,6 @@ import UserSampleListStore  from "Store/UserSampleListStore"
               d.x = +d.x ;
               d.y = +d.y ;
               d.href = `${current_domain}/${d.topic_id}.png` ;
-              console.log(d.href) ;
           });
 
           let chart_div = d3.select(".d3-map") ;
