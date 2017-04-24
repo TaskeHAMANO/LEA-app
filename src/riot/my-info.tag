@@ -66,7 +66,7 @@ import SelectInfoStore      from "Store/SelectInfoStore"
           <my-bar data={topic_list} element_name={topic_element_name} chart_id="topic_bar_chart" color={topic_color} width={bar_width} height={bar_height}></my-bar>
         </div>
         <div id="word_chart" if={word_list}>
-          <h3>Word</h3>
+          <h3>Words</h3>
           <ul class="list-group">
             <li each={word in word_list} class="list-group-item">{word.word}</li>
           </ul>
