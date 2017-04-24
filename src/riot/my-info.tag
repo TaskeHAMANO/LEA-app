@@ -56,13 +56,13 @@ import SelectInfoStore      from "Store/SelectInfoStore"
     <div class="row row-chart">
       <div class="col-xs-6">
         <div id="taxon_chart" if={taxon_list}>
-          <h3>Taxon</h3>
+          <h3>Taxa</h3>
           <my-bar data={taxon_list} element_name={taxon_element_name} chart_id="taxon_bar_chart" color={taxon_color} width={bar_width} height={bar_height}></my-bar>
         </div>
       </div>
       <div class="col-xs-6">
         <div id="topic_chart" if={topic_list}>
-          <h3>Topic</h3>
+          <h3>Topics</h3>
           <my-bar data={topic_list} element_name={topic_element_name} chart_id="topic_bar_chart" color={topic_color} width={bar_width} height={bar_height}></my-bar>
         </div>
         <div id="word_chart" if={word_list}>

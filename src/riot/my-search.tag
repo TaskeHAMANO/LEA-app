@@ -22,7 +22,7 @@ import SampleListAction from "Action/SampleListStoreAction"
       <div class="col-xs-6 col-lg-12" if={sem_topic_list}>
         <div each="{sem_topic in sem_topic_list}" class="menu-category list-group">
           <div class="menu-category-name list-group-item active">
-            <h4> Semantic meaning of current status </h4>
+            <h4> Words within the most relevant topic </h4>
           </div>
           <a each="{word_value in sem_topic.word}" href="javascript:void(0)" class="menu-item list-group-item" onclick='{click_word}'>
             {word_value.word}
@@ -33,7 +33,7 @@ import SampleListAction from "Action/SampleListStoreAction"
       <div class="col-xs-6 col-lg-12" if={eco_topic_list}>
         <div each="{eco_topic in eco_topic_list}" class="menu-category list-group">
           <div class="menu-category-name list-group-item active">
-            <h4> Ecologically co-occurrence word </h4>
+            <h4> Words within the frequently co-occurring topic </h4>
           </div>
           <a each="{word_value in eco_topic.word}" href="javascript:void(0)" class="menu-item list-group-item" onclick='{click_word}'>
             {word_value.word}

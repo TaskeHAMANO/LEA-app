@@ -167,7 +167,7 @@ import MouseOnAction from "Action/MouseOnStoreAction"
         .attr("x", 0)
         .attr("font-size", "14px")
         .attr("fill", "#000")
-        .text("Abundance") ;
+        .text("Relative Abundance") ;
     }
   </script>
 </my-bar>
