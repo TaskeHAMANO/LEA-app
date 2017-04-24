@@ -17,7 +17,7 @@ import UserSampleListAction from "Action/UserSampleListStoreAction"
           <h3>Upload</h3>
           <form onSubmit={submit} id="upload_form">
             <h4>Upload cluster file</h4>
-            <h5>.cluster file or tar.gz compressed cluster file by <a href="http://snail.nig.ac.jp/vitcomic2/">VITCOMIC2</a></h5>
+            <h5>.cluster file or tar.gz compressed cluster file by <a href="http://vitcomic.org">VITCOMIC2</a></h5>
             <input type="file" id="upload_file">
             <button type="submit" class="btn btn-primary">Submit</button>
             <button type="reset" name="reset" class="btn btn-default" onclick="{reset}">Reset</button>
