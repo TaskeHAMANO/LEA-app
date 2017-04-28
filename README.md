@@ -6,6 +6,7 @@ Application for Latent Environment Allocation written by ECMA Script 2015.
 ### Requirement
 * Node.js
 * npm
+* bower
 
 ### How to use
 
