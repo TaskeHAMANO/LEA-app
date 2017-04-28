@@ -33,6 +33,8 @@ open dist/index.html
 
 
 ### Contants
+
+```
 .
 ├── README.md
 ├── bower.json
@@ -85,6 +87,7 @@ open dist/index.html
         ├── my-map.tag
         ├── my-panel.tag
         └── my-search.tag
+```
 
 #### README.md
 * このファイルです
