@@ -103,7 +103,7 @@ open dist/index.html
 #### dist
 * gulpでビルドされたデプロイ用のファイルが配置されるディレクトリです
 
-####gulpfile.js, gulptask.js
+#### gulpfile.js, gulptask.js
 * gulpでビルドする際の手順が記述されたファイルです
 
 #### node_modeles
